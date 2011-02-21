@@ -1,0 +1,277 @@
+## System Config - Z-Pulley Off-site Dev Box (GenWest Rack)
+## ASRock x58 MOBO
+## 12 gig ram
+## 300 gig 10k root
+## Raid6 Storage disk (Areca raid card)(8-2TB hitachi disks) 
+## Initial setup 11/12/10 APR
+##
+################## General System Setup ################
+
+################ AS ROOT ################
+
+# Get a real editor installed (emacs of course)
+sudo apt-get install emacs
+
+# Can create some user accounts
+adduser <your user>
+
+# Add those new users to the sudoers
+visudo
+# Check that they were added correctly
+more /etc/sudoers
+
+
+################ AS REGULAR USER ################
+
+# Add a hostname
+sudo emacs /etc/hostname
+# Add the following line:
+<your domain>
+# Refresh the hostname
+sudo hostname -F /etc/hostname
+
+# Update the hosts
+sudo emacs /etc/hosts
+# Add the following line
+127.0.0.1 <your domain>
+
+# Log out and log back in...
+
+# Update the system
+sudo apt-get update
+sudo apt-get upgrade
+
+################## General Development Setup ###########
+# Apache
+sudo apt-get install apache2 apache2-threaded-dev apache2-mpm-prefork apache2-utils
+
+# Python Tools
+sudo apt-get install python-setuptools python-dev python-psycopg2 libapache2-mod-python
+
+# Update the default web page
+sudo emacs /var/www/index.html
+
+# Tools for working with version control and downloads
+sudo apt-get install wget curl unzip libcurl4-gnutls-dev subversion python-subversion patch subversion-tools
+
+# Build Tools
+sudo apt-get install build-essential
+
+# Other utilies
+sudo apt-get install imagemagick
+
+# vim install
+sudo apt-get install vim
+
+# git install
+sudo apt-get install git
+
+# Depedencies for Mapnik
+#sudo apt-get install libtiff4 libtiff4-dev libltdl7 libltdl7-dev
+#sudo apt-get install libcairo2 libcairo2-dev python-cairo python-cairo-dev libcairomm-1.0-1 libcairomm-1.0-dev
+#sudo apt-get install libboost1.35-dev libboost-filesystem1.35-dev libboost-iostreams1.35-dev libboost-program-options1.35-dev libboost-python1.35-dev libboost-regex1.35-dev libboost-thread1.35-dev
+
+### Dependencies for TileCache and PDFPrint
+# Install PIL for Tilecache as well as print to PDF which uses PIL for 
+# image manipulation
+sudo apt-get install python-imaging
+# Install Reportlab
+sudo apt-get install python-reportlab
+# Simple JSON
+sudo apt-get install python-simplejson
+
+# Depedencies for OpenStreetMap tools
+sudo apt-get install libxml2-dev libbz2-dev
+
+################## Database Setup From Packages #############
+## Postgresql - needed to use PostGIS ontop 
+sudo apt-get install postgresql-8.4 postgresql-server-dev-8.4 postgresql-contrib-8.4
+#sudo apt-get install libdbd-pg-perl
+#sudo apt-get install libcrypt-ssleay-perl
+
+#### Ended up removing 8.4 and hand installed 9.x
+wget http://ftp9.us.postgresql.org/pub/mirrors/postgresql/source/v9.0.3/postgresql-9.0.3.tar.gz
+tar -xzvf postgresql-9.0.3.tar.gz
+cd postgresql-9.0.3/
+./configure
+make
+sudo make install
+
+
+### Add the following to /etc/profile to get the postgresql path in all profiles
+##export PATH=/usr/local/pgsql/bin/:$PATH
+##
+
+# test starting up the database
+sudo su - postgres
+/usr/local/pgsql/bin/initdb -D /mnt/z-raid6/postgresql_data
+/usr/local/pgsql/bin/postgres -D /mnt/z-raid6/postgresql_data >/mnt/z-raid6/postgresql_data/logfile 2>&1 &
+
+## install intarray for diff support
+cd /usr/local/src/postgresql/postgresql-9.0.3/contrib/intarray
+sudo make
+sudo make install
+# verify installation
+pg_config --sharedir
+cd /usr/local/pgsql/share/contrib
+# should see _int.sql
+# restart postgresql
+sudo /etc/init.d/postgresql restart
+
+################## GIS Setup From SRC ##################
+# Make some dirs to hold all the src in /usr/local/src
+cd /usr/local/src
+mkdir geos
+mkdir proj
+mkdir postgis
+mkdir gdal
+mkdir mapserver
+mkdir featureserver
+mkdir openlayers
+mkdir tilecache
+
+
+## GEOS
+cd geos
+# Release
+wget http://download.osgeo.org/geos/geos-3.2.2.tar.bz2
+tar -xjvf geos-3.2.2.tar.bz2
+cd geos-3.2.2
+./configure
+make
+sudo make install
+sudo ldconfig
+
+## Proj4
+cd proj
+# Release
+wget http://download.osgeo.org/proj/proj-4.7.0.tar.gz
+tar -xzvf proj-4.7.0.tar.gz
+cd proj-4.7.0/nad
+wget http://download.osgeo.org/proj/proj-datumgrid-1.5.zip
+unzip proj-datumgrid-1.5.zip
+rm proj-datumgrid-1.5.zip
+cd ..
+./configure
+make
+sudo make install
+sudo ldconfig
+
+## Make sure to re-add any custom projections in '/usr/local/share/proj/epsg' if you recompile proj
+
+## PostGIS
+## Needed apt-get packages...
+sudo apt-get install flex bison byacc
+
+cd postgis
+# Release
+wget http://postgis.refractions.net/download/postgis-1.5.2.tar.gz
+tar -xzvf postgis-1.5.2.tar.gz
+cd postgis-1.5.2
+./configure
+make 
+sudo make install
+sudo ldconfig
+
+## osm2pgsql
+cd /usr/local/src/
+sudo svn export http://svn.openstreetmap.org/applications/utils/export/osm2pgsql/
+# changed ownership of folder to CUGOS group
+chown -R mattk:cugos osm2pgsql
+# needed to install autoconf / libtools
+aptitude install autoconf libtool
+./autogen.sh
+./configure
+make
+sudo make install
+sudo ldconfig
+# test
+osm2pgsql --help
+
+################## GIS Datasets ####################
+
+### Natural Earth ###
+## backup original natural earth data
+mv /mnt/z-raid6/gis/natural_earth/ /mnt/z-raid6/gis/natural_earth_orig/
+## make directories for different scales 10m 110m 50m
+## open a screen for each large download
+screen
+## wget each dataset from natural earth http://www.naturalearthdata.com/downloads/
+## recursively unzip files
+unzip \*.zip
+
+################### TODO ##########
+
+# Create a 'template_postgis' database with all spatial extensions
+# As the postgres user
+sudo su - postgres
+POSTGIS_SQL_PATH=`pg_config --sharedir`/contrib/postgis-1.5
+createdb -E UTF8 template_postgis # Creating the template spatial database.
+createlang -d template_postgis plpgsql # Adding PLPGSQL language support.
+psql -d template_postgis -f $POSTGIS_SQL_PATH/postgis.sql # add spatial functions
+psql -d template_postgis -f $POSTGIS_SQL_PATH/spatial_ref_sys.sql # add srs table
+psql -d template_postgis -c "GRANT ALL ON geometry_columns TO PUBLIC;" # Enabling users to alter spatial tables.
+psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
+
+# Optional
+# Create new database superusers for your unix user
+createuser <your user>
+Shall the new role be a superuser? (y/n) y
+
+## Download MrSID SDK
+
+## GDAL
+cd gdal
+# Release
+# wget http://download.osgeo.org/gdal/gdal-1.7.2.tar.gz
+# Use Trunk
+svn checkout https://svn.osgeo.org/gdal/trunk/gdal gdal-trunk
+cd gdal-trunk
+./configure --with-python --with-threads --with-mrsid=/usr/local/src/mrsid/Geo_DSDK-7.0.0.2167
+make
+sudo make install
+sudo ldconfig
+
+## Mapserver
+# Needed apt-get packages
+sudo apt-get install libgd2-xpm libgd2-xpm-dev
+sudo apt-get install libxslt1-dev
+sudo apt-get install libpam0g-dev
+sudo apt-get install libreadline5-dev
+
+cd mapserver
+# Release
+wget http://download.osgeo.org/mapserver/mapserver-5.6.5.tar.gz
+tar -xzvf mapserver-5.6.5.tar.gz
+cd mapserver-5.6.5
+./configure --with-gd --with-freetype --with-zlib --with-postgis --with-threads --with-proj --with-threads --with-ogr --with-gdal --with-geos --with-postgis --with-wfs --with-wmsclient --with-wfsclient --enable-debug 
+make
+sudo chmod +x shp2img
+sudo chmod +x mapserv
+sudo ln -s `pwd`/shp2img /usr/local/bin/shp2img
+# make sure to edit this path in 'mapservg'
+sudo cp mapserv /usr/lib/cgi-bin/
+cd mapscript/python/
+sudo python setup.py install
+
+## Featureserver
+cd featureserver
+# Release
+wget http://featureserver.org/featureserver-1.12-full.tar.gz
+tar -xzvf featureserver-1.12-full.tar.gz
+
+
+## Tilecache
+cd tilecache
+# Release
+wget http://tilecache.org/tilecache-2.11.tar.gz
+tar -xzvf tilecache-2.11.tar.gz
+
+
+## Openlayers
+cd openlayers
+# Release
+wget http://openlayers.org/download/OpenLayers-2.10.tar.gz
+tar -xzvf OpenLayers-2.10.tar.gz
+
+

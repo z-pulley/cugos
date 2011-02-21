@@ -1,0 +1,20 @@
+# Organization Membership
+#
+- I added everyone to the obm-cugos-org owners list as wells as the cugos-obm-org-team (this includes the one repository)
+- Everyone in owners has push, pull and admin rights
+- To get into obm-cugos-org view just login into normal github account and click on 'Switch Context'
+- You'll notice an obmgitadmin user. This is unneeded but whatevs.
+
+# public keys and id_rsq.pub
+#
+- You can use your existing id_rsq.pub key from your normal github account to clone, push and pull changes to the repositories that we are all 'Team' members of in the organization
+- Here is a link regarding setting up your public keys http://help.github.com/linux-key-setup/
+
+
+# push,pull,branch,merge --> GIT Tutorials and Help
+#
+- There's a ton of info in http://gitref.org/
+- One of my favorite and human readable tutorials is here http://hoth.entp.com/output/git_for_designers.html
+
+
+
