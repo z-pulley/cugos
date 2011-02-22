@@ -1,4 +1,4 @@
-# Organization Membership
+##### Organizational Membership #####
 #
 - I added everyone to the obm-cugos-org owners list as wells as the cugos-obm-org-team (this includes the one repository)
 - Everyone in owners has push, pull and admin rights
@@ -16,5 +16,54 @@
 - There's a ton of info in http://gitref.org/
 - One of my favorite and human readable tutorials is here http://hoth.entp.com/output/git_for_designers.html
 
+#######################################
+## WORKING DOC FOR GIT COMMANDS <DRAFT>
+#######################################
 
+# initialize a DIR for GIT
+git init
 
+# clone repo
+git clone <URL | GITRL>
+
+# create a branch and switching
+git branch <new_branch_name>
+git checkout <branch_name>
+# all in one combo
+git checkout -b <new_branch_name>
+
+# delete a branch
+git branch -d <branch_name>
+
+# list remote alias and URLs
+git remote
+
+# workspace and staged changes comparison
+git diff # note only works with changed text files not new files
+
+# staged and commit change comparison
+git diff --cached
+
+# all changes
+git diff HEAD
+
+# create a remote branch similar to the one you have locally
+git push origin <branch_name>
+
+# remove remote branch
+git push origin :<branch_name>
+
+# fetch changes from other remote branches
+# cannot change to branches that others added but can merge, diff etc.
+git fetch <alias>
+
+# merge changes from another branch into current working branch
+# command perspective is from
+# current working branch
+git merge <another_branch>
+
+# after fetch we can merge master branch from remote repsoitory to
+# current working branch
+# remember, this is not the same as git merge master from my LOCAL
+# repository
+git merege <alias>/<branch_name eg master>
