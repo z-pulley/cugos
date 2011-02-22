@@ -1,1 +1,32 @@
-#### PLANET UPLOADS NOTES ###
+#### PLANET UPLOADS NOTES ####
+
+## Edit a couple parameters in postgresql.conf to performance tune the database
+shared_buffers = 3000MB   # Set this to 25% of your total RAM 
+bgwriter_delay = 2000ms  # I don't know what a good value is, but since we're loading a lot of data, larger sounds better
+
+## Uncomment last four last lines of default.style to create columns for extra attributes
+## So they look like the following lines
+
+"""
+#The following entries can be used with the --extra-attributes option
+# to include the username, userid, version & timstamp in the DB
+node,way  osm_user       text
+node,way  osm_uid        text
+node,way  osm_version    text
+node,way  osm_timestamp  text
+"""
+
+## Unzip bz2 and rezip as gzip for performance 
+bzcat planet-latest.osm.bz2 | gzip > planet-latest.osm.gz
+
+#### createdb and add intarry support ####
+createdb -T template_postgis -O postgers planetimport
+psql -d sf_test -f /usr/local/pgsql/share/contrib/_int.sql
+
+#### import osm data ####
+# -su to postgres user
+sudo -u -postgres -i -H
+cd /mnt/z-raid6/gis/osm/extracts/planet_dumps/
+# run osm2pgsql
+osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style planet-latest.osm.gzip
+
