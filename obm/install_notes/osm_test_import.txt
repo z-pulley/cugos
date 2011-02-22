@@ -4,7 +4,7 @@
 cd /usr/local/src/postgresql/postgresql-9.0.3/contrib/intarray
 sudo make
 sudo make install
-### verify
+## verify
 pg_config --sharedir
 ls -lh /usr/local/pgsql/share/contrib
 ## should see _int.sql
@@ -12,7 +12,7 @@ ls -lh /usr/local/pgsql/share/contrib
 sudo /etc/init.d/postgresql restart
 
 #### createdb and add intarry support ####
-### after we have shared -su name, then we use -O owner switch with createdb
+## after we have shared -su name, then we use -O owner switch with createdb
 createdb -T template_postgis sf_test
 psql -d sf_test -f /usr/local/pgsql/share/contrib/_int.sql
 
@@ -25,10 +25,10 @@ osm2pgsql --slim -d sf_test -H localhost -P 5432 -C 4096 -S /usr/local/share/osm
 #1 http://wiki.openstreetmap.org/wiki/Planet.osm/diffs>
 #2 http://wiki.openstreetmap.org/wiki/Osmosis/Detailed_Usage
 
-### I took the approach of using hourly replicates
-### to get the inital db import up-to-date
+## I took the approach of using hourly replicates
+## to get the inital db import up-to-date
 
-### inital setup for osmosis ###
+#### inital setup for osmosis ####
 mkdir /mnt/z-raid6/gis/osmosis_working
 cd /usr/local/src/osmosis/osmosis-0.38/bin/
 ## create osmosis working DIR, configuration.txt and download.lock using following osmosis command
@@ -44,12 +44,13 @@ cd /usr/local/src/osmosis/osmosis-0.38/bin/
 http://planet.openstreetmap.org/hour-replicate/000/010/897.state.txt
 ## modify configuration.txt to download hourly replicates
 ## setup maxInterval for 1/2 day chunks
-## maxInterval demarcates a  window ( using the number of seconds ) that osmosis will grab changes from the server
+## maxInterval denotes a timeframe (number of seconds). Osmosis will grab bulk changes from the server
+## for that timeframe and create a diff/changeset
 vim /mnt/z-raid6/gis/osmosis_working/configuration.txt
 baseUrl = http://planet.openstreetmap.org/hour-replicate/
 maxInterval = 43200
 
-### Download replicates in half day chunks ####
+#### Download replicates in half day chunks ####
 ## creating diffs or changesets doesn't seem to work with versions of osmosis <0.36. So make sure to use >0.36.
 ## we are using osmosis 0.38
 ./osmosis --read-replication-interval workingDirectory=/mnt/z-raid6/gis/osmosis_working/ --simplify-change --write-xml-change /mnt/z-raid6/gis/osmosis_working/changes_hourly1.osc.gz
@@ -57,10 +58,9 @@ maxInterval = 43200
 ## check timestamp of state file until it is current
 cat /mnt/z-raid6/gis/osmosis_working/state.txt
 
-### Apply diffs/changeset replicates to PostGIS###
+#### Apply diffs/changeset replicates to PostGIS ####
 ## use osm2pgsql and repeat for each changes_hour.osc.gz you've downloaded ##
 osm2pgsql --append --slim -d sf_test -H localhost -P 5432 -C 4096 -S /usr/local/share/osm2pgsql/default.style changes_hourly1.osc.gz
-
 ## diffs/changesets can also be applied to .osm files before upload to postgis using osmosis
-## the following command throws an error. But it should work
+## the following command throws an error. Haven't gotten it to work yet. 
 ./osmosis --read-xml-change file="/mnt/z-raid6/gis/osmosis_working/changes_hourly1.osc.gz" --read-xml file="/mnt/z-raid6/gis/osm/extracts/sfo_metro.osm" --apply-change --write-xml file="/mnt/z-raid6/gis/extracts/sfo_metro_appliedchanges.osm"
