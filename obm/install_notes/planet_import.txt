@@ -20,8 +20,8 @@ node,way  osm_timestamp  text
 bzcat planet-latest.osm.bz2 | gzip > planet-latest.osm.gz
 
 #### createdb and add intarry support ####
-createdb -T template_postgis -O postgers planetimport
-psql -d sf_test -f /usr/local/pgsql/share/contrib/_int.sql
+createdb -T template_postgis -O postgres planetimport
+psql -d planetimport -f /usr/local/pgsql/share/contrib/_int.sql
 
 #### import osm data ####
 # -su to postgres user
