@@ -1,9 +1,8 @@
 ##### Organizational Membership #####
 #
-- I added everyone to the obm-cugos-org owners list as wells as the cugos-obm-org-team (this includes the one repository)
+- First create organization with owners and a team (repositories fall under teams)
 - Everyone in owners has push, pull and admin rights
-- To get into obm-cugos-org view just login into normal github account and click on 'Switch Context'
-- You'll notice an obmgitadmin user. This is unneeded but whatevs.
+- To get into organization view from profile just login into normal github account and click on 'Switch Context'
 
 # public keys and id_rsq.pub
 #
@@ -13,57 +12,95 @@
 
 # push,pull,branch,merge --> GIT Tutorials and Help
 #
-- There's a ton of info in http://gitref.org/
+- This is my favorite tutorial with a ton of info in http://gitref.org/
 - One of my favorite and human readable tutorials is here http://hoth.entp.com/output/git_for_designers.html
 
-#######################################
-## WORKING DOC FOR GIT COMMANDS <DRAFT>
-#######################################
+###########################################################
+## WORKING DOC FOR GIT COMMANDS <DRAFT> 
+##########################################################
 
-# initialize a DIR for GIT
+# initialize GIT directory
 git init
 
-# clone repo
-git clone <URL | GITRL>
-
-# create a branch and switching
-git branch <new_branch_name>
-git checkout <branch_name>
-# all in one combo
-git checkout -b <new_branch_name>
-
-# delete a branch
-git branch -d <branch_name>
-
-# list remote alias and URLs
-git remote
+# clone remote repo locally
+git clone < URL | GITURL >
+example: git clone git@github.com:z-pulley/cugos.git
 
 # workspace and staged changes comparison
 git diff # note only works with changed text files not new files
-
 # staged and commit change comparison
 git diff --cached
-
 # all changes
 git diff HEAD
 
-# create a remote branch similar to the one you have locally
-git push origin <branch_name>
+# get very descriptive status on working space
+git status
+# get a less descriptive status with short switch
+git status -s
 
+# list all local branchs
+# git branch
+# create a branch
+git branch <new_branch_name>
+# switch branches
+git checkout <branch_name>
+# all in one combo create then switch
+git checkout -b <new_branch_name>
+# delete a branch
+git branch -d <branch_name>
+
+# list remote aliases and URLs
+git remote
+# we can use the alias (default is origin as in origin/master)
+# to pull down changes and merge with our local repo
+git pull
+# git pull is really two steps in one --> a fetch, then a merge
+# I prefer this as does gitref authors
+git fetch <alias>
+git merege <alias>/<branch_name>
+# create a remote branch similar to the one you have locally
+# so your working brach changes are staged and visible
+# and able to be merged
+git push origin <branch_name>
 # remove remote branch
 git push origin :<branch_name>
 
-# fetch changes from other remote branches
-# cannot change to branches that others added but can merge, diff etc.
-git fetch <alias>
 
-# merge changes from another branch into current working branch
+########################################################
+# Merging confusion
+#######################################################
+# Best to think of merge in two ways -- local and remote (though they are the same in the end)
+
+# 1) we merge local branches into each other.
+# for example, if i had my local master branch and another branch
+# called  branch2 (that I wasn't pushing to remotely) then to merge changes from branch2
+# into master I would a) checkout master branch b) merge branch2
 # command perspective is from
-# current working branch
+# current working branch. so
 git merge <another_branch>
+example: git merge branch2 
+# then I'd checkout branch2 and merge master branch changes into branch2
+example: git merge master
 
-# after fetch we can merge master branch from remote repsoitory to
-# current working branch
-# remember, this is not the same as git merge master from my LOCAL
-# repository
-git merege <alias>/<branch_name eg master>
+# 2) The second way to think about merge is in relation to remote branches
+# Let's say someone added a new branch in between our pulls called reallynewbranch
+# We wouldn't see those changes till we fetch. So first we fetch changes with git fetch <alias>
+# Now we can see the added branches from remote repository
+# We can't checkout these branches, but we can merge that code into our
+# working branch.
+# So the second step is the merge but with a more refined syntax
+git merge <alias>/<branch_name>
+example: git merge origin/reallynewbranch
+
+# Which brings me to the final confusing point:
+# THERE IS NO DIFFERENCE BETWEEN THESE TWO APPROACHES
+# THEY ARE EXACTLY THE SAME. THE FIRST EXAMPLE IS SHORTCUT SYNTAX
+# IT SEEMS B/C WE KNOW THE DEFAULT ALIAS IS "ORIGIN".
+# THE SECOND WAY IS JUST MORE EXPLICIT. SO MAYBE YOU SHOULD BE
+# VERY SPECFIC ABOUT YOUR LOCAL MERGE ALSO
+
+# So the first merge example can be done like this
+git checkout master
+git merge origin/branch2
+git checkout branch2
+git merge origin/master
