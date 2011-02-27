@@ -34,4 +34,12 @@ osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/s
 
 
 #### --appending planet daily diff files with osm2pgsql ####
-# diff files reside in 
+# daily diffs are located in /mnt/z-raid6/gis/osmosis_working/daily_diffs
+# everything in /mnt/z-raid6/gis/osmosis_working/ is valuable
+# so here is a description of files in /mnt/z-raid6/gis/osmosis_working
+1. configuration.txt, configuration.txt.bak, state.txt --> all related to osmosis workingspace configuration for getting minutely and hourly diffs
+2. changes.osc.gz --> a zip file of changes that was probably pulled down from osmosis program
+3. logs --> logs about osmosis program incorporating daily and hourly diffs
+4. import_changes.sh --> a bash script showing how mkenny imported daily diffs into sfo test dataset
+5. update-db.sh --> a bash script added to cronjob showing how mkenny got synched minutely updates using osmosis and osm2pgsql
+
