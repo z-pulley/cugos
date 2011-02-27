@@ -14,19 +14,24 @@ node,way  osm_user       text
 node,way  osm_uid        text
 node,way  osm_version    text
 node,way  osm_timestamp  text
-"""
+"""o
 
-## Unzip bz2 and rezip as gzip for performance 
+## Unzip bz2 and rezip as gzip for performance
+## We never got this working. So it is still unresolved 
+## to how much this will help
 bzcat planet-latest.osm.bz2 | gzip > planet-latest.osm.gz
 
 #### createdb and add intarry support ####
 createdb -T template_postgis -O postgres planetimport
 psql -d planetimport -f /usr/local/pgsql/share/contrib/_int.sql
 
-#### import osm data ####
+#### import osm data as postgres user ####
 # -su to postgres user
 sudo -u -postgres -i -H
 cd /mnt/z-raid6/gis/osm/extracts/planet_dumps/
 # run osm2pgsql
 osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style planet-latest.osm.gzip
 
+
+#### --appending planet daily diff files with osm2pgsql ####
+# diff files reside in 
