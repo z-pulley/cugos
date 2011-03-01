@@ -44,3 +44,16 @@ osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/s
 4. import_changes.sh --> a bash script showing how mkenny imported daily diffs into sfo test dataset
 5. update-db.sh --> a bash script added to cronjob showing how mkenny got synched minutely updates using osmosis and osm2pgsql
 
+# I commented out mkenny's daily diff runs in import_changes.sh 
+# and created a new section to run planetimport daily diffs
+# it looks like this:
+"""
+# osm2pgsql commands for applying daily and hourly diffs to planetimport from
+DIFFDIR="/mnt/z-raid6/gis/osmosis_working/daily_diffs/"
+SUFFIX="gz"
+
+for diff in  "$DIFFDIR"/*.$SUFFIX
+do
+        osm2pgsql --append --slim -d planetimport -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style $diff  
+done
+"""
