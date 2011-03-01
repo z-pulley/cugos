@@ -2,6 +2,7 @@
 
 ## Edit a couple parameters in postgresql.conf to performance tune the database
 shared_buffers = 3000MB   # Set this to 25% of your total RAM 
+Added "kernel.shmmax=3221159936" into /etc/sysct.conf to support the need for larger shared memory #This was tested first w/ command "sudo /sbin/sysctl -w kernel.shmmax=3221159936"
 bgwriter_delay = 2000ms  # I don't know what a good value is, but since we're loading a lot of data, larger sounds better
 
 ## Uncomment last four last lines of default.style to create columns for extra attributes
@@ -14,7 +15,7 @@ node,way  osm_user       text
 node,way  osm_uid        text
 node,way  osm_version    text
 node,way  osm_timestamp  text
-"""o
+"""
 
 ## Unzip bz2 and rezip as gzip for performance
 ## We never got this working. So it is still unresolved 
