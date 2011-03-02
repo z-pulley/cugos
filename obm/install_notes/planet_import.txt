@@ -1,13 +1,22 @@
 #### PLANET UPLOADS NOTES ####
 
-## Edit a couple parameters in postgresql.conf to performance tune the database
+#### Edit a couple parameters in postgresql.conf ####
+## These increase the postgresql shared buffer through RAM support
+## and allows postgres backend quicker access to reads and writes 
+## before talking with disk
 shared_buffers = 3000MB   # Set this to 25% of your total RAM 
-Added "kernel.shmmax=3221159936" into /etc/sysct.conf to support the need for larger shared memory #This was tested first w/ command "sudo /sbin/sysctl -w kernel.shmmax=3221159936"
+Added "kernel.shmmax=3221159936" into /etc/sysct.conf to support the need for larger shared memory #this was tested first w/ command "sudo /sbin/sysctl -w kernel.shmmax=3221159936"
 bgwriter_delay = 2000ms  # I don't know what a good value is, but since we're loading a lot of data, larger sounds better
+
+## Remember, above tunings are not enough for fast planet import
+## osm2pgsql takes a -C switch (see below) which increases kernel buffer cache through RAM support.
+## this increased planet import time considerably when we set switch to -C 10000MB (almost all of available RAM)
+## jury is still out as to what else we can do to make this even faster
+## we saw lots of swap pageins with above tunings and could possibly do better with less 
+## kernel buffer cache set aside and increasing postgresql shared buffer past 25%
 
 ## Uncomment last four last lines of default.style to create columns for extra attributes
 ## So they look like the following lines
-
 """
 #The following entries can be used with the --extra-attributes option
 # to include the username, userid, version & timstamp in the DB
@@ -23,15 +32,37 @@ node,way  osm_timestamp  text
 bzcat planet-latest.osm.bz2 | gzip > planet-latest.osm.gz
 
 #### createdb and add intarry support ####
-createdb -T template_postgis -O postgres planetimport
-psql -d planetimport -f /usr/local/pgsql/share/contrib/_int.sql
+createdb -T template_postgis -O postgres planet
+psql -d planet -f /usr/local/pgsql/share/contrib/_int.sql
 
-#### import osm data as postgres user ####
+#### use screen and love it! ####
+# import of planet data should be done in screen
+# to create a screen as user you do
+screen -S <name_of_screen>
+# to safely leave screen CTRL-A, then press D seperately 
+# get back in as user who created screen
+screen -r <name_of_screen>
+# to list all screens as user
+screen -ls
+# to create a screen as root
+sudo screen -S <name_of_screen>
+# to share this screen with multi users, once in screen
+CTRL-A, then SHIFT :, then type "multiuser on", then hit enter
+# then you have to add users
+CTRL-A, then SHIFT :, then type "acladd <user_name>" # for user to share
+share with
+# we are still unsure about whether groups (like cugos can share multiuser), must check
+
+
+#### once, in screen do import of planet as postgres user ####
 # -su to postgres user
 sudo -u -postgres -i -H
 cd /mnt/z-raid6/gis/osm/extracts/planet_dumps/
 # run osm2pgsql
-osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style planet-latest.osm.gzip
+# the last run starting on 02/21/11 we used this osm2pgsql statement
+# osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style planet-latest.osm.bz2
+# run 03/01/11 osm2pgsql statement
+osm2pgsql --slim -d planet -x -H localhost -P 5432 -C 4000 -S /usr/local/share/osm2pgsql/default.style /mnt/z-raid6/gis/osm/planet_dumps/planet_110224/planet-latest.osm.bz2
 
 
 #### --appending planet daily diff files with osm2pgsql ####
@@ -51,9 +82,17 @@ osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/s
 # osm2pgsql commands for applying daily and hourly diffs to planetimport from
 DIFFDIR="/mnt/z-raid6/gis/osmosis_working/daily_diffs/"
 SUFFIX="gz"
+HOST=$(hostname|cut -f1 -d.)
+TIMESTAMP=$(date +%m/%d/%y.%H:%M:%S)
+LOGDIR="/mnt/z-raid6/gis/osmosis_working/logs"
+LOGFILE=${HOST}."planetimport".${TIMESTAMP}."_log_".txt
+touch $LOGDIR/$LOGFILE
 
 for diff in  "$DIFFDIR"/*.$SUFFIX
 do
-        osm2pgsql --append --slim -d planetimport -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style $diff  
-done
+        echo "TARGET DIFF >>> " $diff " START processing at >>> " $TIMESTAMP #> $LOGDIR/$LOGFILE
+        osm2pgsql --append --slim -d planetimport -H localhost -P 5432 -S /usr/local/share/osm2pgsql/default.style $diff
+        ENDTIMESTAMP=$(date +%m/%d/%y.%H:%M:%S)
+        echo "TARGET DIFF >>> " $diff " END processing at >>> " $ENDTIMESTAMP #> $LOGDIR/$LOGFILE
+done   
 """

@@ -1,6 +1,6 @@
 ##### Load and Update SFO OSM Extract #####
 
-#### make intarray contrib module ####
+#### make intarray contrib module if not already done (only needs to be run once after postgresql/gis install ####
 cd /usr/local/src/postgresql/postgresql-9.0.3/contrib/intarray
 sudo make
 sudo make install
@@ -58,9 +58,45 @@ maxInterval = 43200
 ## check timestamp of state file until it is current
 cat /mnt/z-raid6/gis/osmosis_working/state.txt
 
-#### Apply diffs/changeset replicates to PostGIS ####
+#### Apply diffs/changeset replicates to PostGIS (there is a manual and automatic process for this step)####
+## MANUAL PROCESS ##
 ## use osm2pgsql and repeat for each changes_hour.osc.gz you've downloaded ##
 osm2pgsql --append --slim -d sf_test -H localhost -P 5432 -C 4096 -S /usr/local/share/osm2pgsql/default.style changes_hourly1.osc.gz
 ## diffs/changesets can also be applied to .osm files before upload to postgis using osmosis
 ## the following command throws an error. Haven't gotten it to work yet. 
 ./osmosis --read-xml-change file="/mnt/z-raid6/gis/osmosis_working/changes_hourly1.osc.gz" --read-xml file="/mnt/z-raid6/gis/osm/extracts/sfo_metro.osm" --apply-change --write-xml file="/mnt/z-raid6/gis/extracts/sfo_metro_appliedchanges.osm"
+
+## AUTOMATIC PROCESS ##
+#### Create cron job through crontab to automate ####
+## create a bash script in osmosis working directory that
+## 1) calls osmosis to create diff 2) then runs osm2pgsql to --append changes to DB
+## There is a script update-db.sh that mattk used for sfo test  dataset
+## Here are the contents of that bash script
+#!/bin/bash
+TIMESTAMP=$(date +%m/%d/%y.%H:%M:%S)
+'''
+if [ -e /WORKSPACE/osmosis/working/download.lock ]
+then
+    echo 'Update in progress.....'
+else
+    touch /WORKSPACE/osmosis/working/download.lock
+
+    echo "START >>> osmosis 1/2 day downloads at " $TIMESTAMP
+    /home/gcorradini/Downloads/osmosis-0.38/bin/osmosis --read-replication-interval workingDirectory=/WORKSPACE/osmosis/working/ --simplify-change --write-xml-change /WORKSPACE/osmosis/working/changes.osc.gz
+   
+    /usr/bin/osm2pgsql --append --slim -d sfo -S /usr/share/osm2pgsql/default.style /WORKSPACE/osmosis/working/changes.osc.gz
+
+    rm /WORKSPACE/osmosis/working/download.lock
+    ENDTIMESTAMP=$(date +%m/%d/%y.%H:%M:%S)
+    echo "FINISHED >>> osmosis 1/2 day downloads at " $ENDTIMESTAMP
+fi
+'''
+## Add to bashscript to cron job with crontab -e ##
+## make sure it is added under postgresql user
+## below are the contents of crontab file
+## This is saying run the script every 15 minutes
+## and log output/errors to cronlog.txt
+*/15 * * * * /WORKSPACE/osmosis/working/update-db.sh >> /WORKSPACE/osmosis/working/cronlog.txt 2>&1
+
+
+
