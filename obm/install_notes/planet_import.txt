@@ -32,19 +32,12 @@ node,way  osm_timestamp  text
 bzcat planet-latest.osm.bz2 | gzip > planet-latest.osm.gz
 
 #### createdb and add intarry support ####
-createdb -T template_postgis -O postgres planet
+createdb -T template_postgis -O postgres planet0302
 psql -d planet -f /usr/local/pgsql/share/contrib/_int.sql
 
 #### use screen and love it! ####
-# import of planet data should be done in screen
-# to create a screen as user you do
-screen -S <name_of_screen>
-# to safely leave screen CTRL-A, then press D seperately 
-# get back in as user who created screen
-screen -r <name_of_screen>
-# to list all screens as user
-screen -ls
-# to create a screen as root
+# import of planet data should be done in screen with multiuser on and everyone's name added using acladd
+# to create a screen as root, only way to share we know of now
 sudo screen -S <name_of_screen>
 # to share this screen with multi users, once in screen
 CTRL-A, then SHIFT :, then type "multiuser on", then hit enter
@@ -56,13 +49,11 @@ share with
 
 #### once, in screen do import of planet as postgres user ####
 # -su to postgres user
-sudo -u -postgres -i -H
+sudo su - postgres
 cd /mnt/z-raid6/gis/osm/extracts/planet_dumps/
 # run osm2pgsql
-# the last run starting on 02/21/11 we used this osm2pgsql statement
-# osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style planet-latest.osm.bz2
-# run 03/01/11 osm2pgsql statement
-osm2pgsql --slim -d planet -x -H localhost -P 5432 -C 4000 -S /usr/local/share/osm2pgsql/default.style /mnt/z-raid6/gis/osm/planet_dumps/planet_110224/planet-latest.osm.bz2
+# the last run starting on 03/04/11 we used this osm2pgsql statement
+# osm2pgsql --slim -d planet0304 -x -H localhost -P 5432 -C 8500 -S /usr/local/share/osm2pgsql/default.style planet-latest.osm.bz2
 
 
 #### --appending planet daily diff files with osm2pgsql ####
