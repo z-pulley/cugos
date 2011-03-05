@@ -1,0 +1,24 @@
+Planet / 12 GB Benchmark
+
+**** THIS IS UNFINISHED, WILL FINISH LATER *********
+
+    * Import Description: planet file (planet-latest.osm.bz2) 03/03/11
+    * RAM: 12GB
+    * CPU: <Please Fill aaronr>
+    * DISK(s): <Please Fill aaronr>
+    * OS: Debian
+    * osm2pgsql SVN version 0.69-20672
+          o slim mode
+          o --cache 8500MB
+          o time osm2pgsql -s -v -U mapper -S ./default.style -d gis -C 3000 ../planet/planet-100324.osm.bz2 
+    * PostgreSQL 8.4.2
+          o shared_buffers = 3000MB
+          o maintenance_work_mem = 256MB
+          o checkpoint_segments = 20
+          o autovacuum = off 
+    * PostGIS 1.5
+    * Results: (49.75 Hours) 
+
+real	XXXXXXXXXXX
+user	XXXXXXXXXXX
+sys	XXXXXXXXXXX
