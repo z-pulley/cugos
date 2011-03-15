@@ -275,4 +275,29 @@ cd openlayers
 wget http://openlayers.org/download/OpenLayers-2.10.tar.gz
 tar -xzvf OpenLayers-2.10.tar.gz
 
+## mapnik2
+cd /usr/local/src/
+# mapnik2 merged to svn trunk
+sudo svn checkout http://svn.mapnik.org/trunk mapnik
+sudo chown -R mattk:cugos mapnik
+python scons/scons.py configure
+python scons/scons.py
+sudo python scons/scons.py install
+# test
+$ python
+>>> import mapnik2
 
+## cascadenik
+cd /usr/local/src/
+sudo mkdir cascadenik
+cd cascadenik
+sudo wget https://github.com/mapnik/Cascadenik/zipball/mapnik2
+sudo unzip mapnik2
+cd /mapnik-Cascadenik-7dc2587
+# install dependencies
+sudo easy_install cssutils
+sudo easy_install pil
+# install
+sudo python setup.py install
+# test
+$ cascadenik-compile.py

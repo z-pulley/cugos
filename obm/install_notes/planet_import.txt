@@ -1,19 +1,22 @@
 #### PLANET UPLOADS NOTES ####
 
-#### Edit a couple parameters in postgresql.conf ####
-## These increase the postgresql shared buffer through RAM support
+#### Edit a couple parameters in postgresql.conf for tuning ####
+## These increase the postgresql shared buffer through RAM
 ## and allows postgres backend quicker access to reads and writes 
 ## before talking with disk
 shared_buffers = 3000MB   # Set this to 25% of your total RAM 
 Added "kernel.shmmax=3221159936" into /etc/sysct.conf to support the need for larger shared memory #this was tested first w/ command "sudo /sbin/sysctl -w kernel.shmmax=3221159936"
 bgwriter_delay = 2000ms  # I don't know what a good value is, but since we're loading a lot of data, larger sounds better
 
+
 ## Remember, above tunings are not enough for fast planet import
-## osm2pgsql takes a -C switch (see below) which increases kernel buffer cache through RAM support.
-## this increased planet import time considerably when we set switch to -C 10000MB (almost all of available RAM)
-## jury is still out as to what else we can do to make this even faster
-## we saw lots of swap pageins with above tunings and could possibly do better with less 
-## kernel buffer cache set aside and increasing postgresql shared buffer past 25%
+## osm2pgsql takes a -C switch (see below) which increases the buffering of disk I/O through RAM.
+## This increased planet import time considerably on parsing NODES 
+## when we set switch to -C 10000MB (almost all of available RAM).
+## Jury is still out as to what else we can do to make this faster.
+## We saw a lot of swap page-in activity with above tunings and could possibly do better with less 
+## buffer cache set aside and increasing postgresql shared buffer past 25%
+
 
 ## Uncomment last four last lines of default.style to create columns for extra attributes
 ## So they look like the following lines
@@ -26,58 +29,89 @@ node,way  osm_version    text
 node,way  osm_timestamp  text
 """
 
+
 ## Unzip bz2 and rezip as gzip for performance
-## We never got this working. So it is still unresolved 
+## NOTE: We never got this working. So it is still unresolved 
 ## to how much this will help
 bzcat planet-latest.osm.bz2 | gzip > planet-latest.osm.gz
 
+
 #### createdb and add intarry support ####
-createdb -T template_postgis -O postgres planet
-psql -d planet -f /usr/local/pgsql/share/contrib/_int.sql
+createdb -T template_postgis -O postgres planet0304
+psql -d planet0304 -f /usr/local/pgsql/share/contrib/_int.sql
+
 
 #### use screen and love it! ####
-# import of planet data should be done in screen
-# to create a screen as user you do
-screen -S <name_of_screen>
-# to safely leave screen CTRL-A, then press D seperately 
-# get back in as user who created screen
-screen -r <name_of_screen>
-# to list all screens as user
-screen -ls
-# to create a screen as root
+## import of planet data should be done in screen with multiuser on and everyone's name added using acladd
+## to create a screen as root, only way to share we know of now
 sudo screen -S <name_of_screen>
-# to share this screen with multi users, once in screen
+## to share this screen with multi users, once in screen
 CTRL-A, then SHIFT :, then type "multiuser on", then hit enter
-# then you have to add users
+## then you have to add users
 CTRL-A, then SHIFT :, then type "acladd <user_name>" # for user to share
 share with
-# we are still unsure about whether groups (like cugos can share multiuser), must check
+## we are still unsure about whether groups (like cugos can share multiuser), must check
 
 
-#### once, in screen do import of planet as postgres user ####
-# -su to postgres user
-sudo -u -postgres -i -H
-cd /mnt/z-raid6/gis/osm/extracts/planet_dumps/
-# run osm2pgsql
-# the last run starting on 02/21/11 we used this osm2pgsql statement
-# osm2pgsql --slim -d planetimport -x -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style planet-latest.osm.bz2
-# run 03/01/11 osm2pgsql statement
-osm2pgsql --slim -d planet -x -H localhost -P 5432 -C 4000 -S /usr/local/share/osm2pgsql/default.style /mnt/z-raid6/gis/osm/planet_dumps/planet_110224/planet-latest.osm.bz2
+#### set up some system monitoring logs for later inspection ####
+## This proves useful to go back and compare to what's happening in program.
+## This is a script gcorradini wrote and it's by no means pretty or succintly useful ;
+## The cron job that runs this script is listed below
+	#!/bin/bash
+	TIMESTAMP=$(date +%m/%d/%y.%H:%M:%S)
+	echo ""
+	echo ""
+	echo "####################################################################"
+	echo "####################################################################"
+	echo "SAMPLE @ >>> " $TIMESTAMP
+	echo "####################################################################"
+	echo "####################################################################"
+	echo ""
+	echo ""
+	echo "######## vmstat output #########################"
+	vmstat 1 4
+	echo "######## process tree for user postgres  #######"
+	#ps -ALF | sort -nr -k 4 | head -30
+	ps -U postgres -H
+	echo "######## process tree -F user postgres #########"
+	ps -U postgres -jHF
+	echo "######## thread listing for user postgres ######"
+	#ps -ALF | sort -nr -k 3 | head -30
+	ps -U postgres -LF
+	echo "######## process size/thread cnt postgres ######"
+	ps -U postgres -o pid,nlwp,vsz,args
+	echo "######## free output by MB  ####################"
+	free -m
+	echo "######## loading average #######################"
+	uptime
+## Here's the cron job
+## gcorradini often went in at different points of osm2pgsql execution to 
+## change the time parameter
+*/15 * * * * /mnt/travel-disk/planet_download/pimp-logger.sh >> /mnt/travel-disk/planet_download/pimp_log.txt 2>&1
+
+
+#### once in screen do import of planet as postgres user ####
+## -su to postgres user
+sudo su - postgres
+cd /mnt/z-raid6/gis/osm/extracts/planet_dumps/ or /mnt/travel-disk/planet_downloads
+## run osm2pgsql
+## the last run starting on 03/04/11 we used this osm2pgsql statement
+## osm2pgsql --slim -d planet0304 -x -H localhost -P 5432 -C 8500 -S /usr/local/share/osm2pgsql/default.style planet-latest.osm.bz2
 
 
 #### --appending planet daily diff files with osm2pgsql ####
-# daily diffs are located in /mnt/z-raid6/gis/osmosis_working/daily_diffs
-# everything in /mnt/z-raid6/gis/osmosis_working/ is valuable
-# so here is a description of files in /mnt/z-raid6/gis/osmosis_working
-1. configuration.txt, configuration.txt.bak, state.txt --> all related to osmosis workingspace configuration for getting minutely and hourly diffs
+## daily diffs are located in /mnt/z-raid6/gis/osmosis_working/daily_diffs
+## everything in /mnt/z-raid6/gis/osmosis_working/ is valuable if directory is squeaky clean.
+## So here is a description of files in /mnt/z-raid6/gis/osmosis_working that are needed
+1. configuration.txt, configuration.txt.bak, state.txt --> all related to osmosis working space configuration for getting minutely and hourly diffs
 2. changes.osc.gz --> a zip file of changes that was probably pulled down from osmosis program
 3. logs --> logs about osmosis program incorporating daily and hourly diffs
 4. import_changes.sh --> a bash script showing how mkenny imported daily diffs into sfo test dataset
 5. update-db.sh --> a bash script added to cronjob showing how mkenny got synched minutely updates using osmosis and osm2pgsql
 
-# I commented out mkenny's daily diff runs in import_changes.sh 
-# and created a new section to run planetimport daily diffs
-# it looks like this:
+## I commented out mkenny's daily diff runs in import_changes.sh 
+## and created a new section to run planetimport daily diffs.
+## It looks like this:
 """
 # osm2pgsql commands for applying daily and hourly diffs to planetimport from
 DIFFDIR="/mnt/z-raid6/gis/osmosis_working/daily_diffs/"
