@@ -4,4 +4,5 @@ install_notes -> System level install notes
 logs -> Apache logs
 conf -> Config dir
 www_root -> Root for www.openbasemap.org
-obm -> OpenBaseMap project 
+obm -> OpenBaseMap project
+osm -> Subdomain for tile rendering

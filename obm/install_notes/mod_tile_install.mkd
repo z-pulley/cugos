@@ -17,6 +17,13 @@ renderd as a rendering backend.
 *    cascadenik.
 *    mod\_tile will run under the cugos group
 
+# TODO/Questions
+
+*    What is a practical way to start the renderd
+     daemon upon system boot? Need new user?
+*    Review mod\_tile config files.
+*    Configure tile expiration.
+
 # Install
 
 Grab mod\_tile source:
@@ -32,7 +39,7 @@ Grab mod\_tile source:
 
 ## Update render_config.h
 
-In render\_config.h, we will changes paths to point to
+In render\_config.h, we will change paths to point to
 mapnik2's fonts and plugins directories. These will vary
 based on install and hardware (e.g. x86/64-bit). Both directories
 should share the same parent, so we can search for mapnik2's
