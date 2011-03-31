@@ -19,8 +19,9 @@ renderd as a rendering backend.
 
 # TODO/Questions
 
-*    What is a practical way to start the renderd
+*    _Question:_ What is a practical way to start the renderd
      daemon upon system boot? Need new user?
+*    _Temporary Answer:_ Use update-rc.d
 *    Review mod\_tile config files.
 *    Configure tile expiration.
 
@@ -182,3 +183,8 @@ we need to modify it to point towards the database:
     14 +XML=/mnt/z-raid6/gis/osm/stylesheet/osm-bright/osm-bright_mapnik2.xml
     15 -HOST=tile.openstreetmap.org
     15 +HOST=osm.openbasemap.org
+
+# Setup renderd to run at boot
+
+    $ sudo cp /usr/local/src/mod_tile/renderd /etc/init.d/renderd
+    $ sudo update-rc.d renderd defaults
