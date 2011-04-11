@@ -1,0 +1,128 @@
+Questions and Thoughts on Issues With Rendering
+===============================================
+
+*    It looks like at lower zoom levels (eg. 4), that many OSM layers
+     are being rendered which should not at that particular scale.
+     This occurrs both when using the standard osm2.xml file as well
+     as with the osm-bright.xml file. _NOTE:_ both files have been
+     upgraded to run under mapnik2 using upgrade\_map\_xml.py
+*    _NOTE:_ See nik2img bug. OBM currently using dbs patched trunk.
+*    example: rendering using the sf\_test database using the osm2.xml
+     stylesheet reports that 74 layers are visible. an example layer,
+     'piers-area' has a 'MaxScaleDenominator' value of '200000'. This
+     layer will still be listed as being, 'visible' when using nik2img
+     to render a map at zoom scale 4, ScaleDenominator = 44726580.7428
+*    _NOTE:_  See nik2img bug. OBM current usinging dbs patched trunk.
+
+# TODO
+
+*    EXPLAIN the query which produces the data for the placenames-large
+     layer. This may lead to insight into the indexes used. May lead to
+     reindexing.
+*    _NOTE:_ EXPLAIN showed Seq Scans running in placenames-large,
+     placenames-capital, and admin-boundaries datasource queries. Indexes
+     added to placenames-capital and admin-boundaries. See sections below.
+
+# nik2img bug
+
+*    nik2img verbose output was listing all layers as being visible due to osm.xml's
+     use of the (Min/Max)ScaleDenominator param, which nik2img didn't track. DBS
+     patched this bug 110403.
+
+# nik2img logging
+
+nik2img reported the following layers as visible for western Europe, zoom level 4:
+
+*    world
+*    roads
+*    admin-01234
+*    placenames-large
+*    placenames-capital
+
+_NOTE:_ Logs and PNGs are stored in '/mnt/z-raid6/gis/osm/stylesheets/tests/'
+
+# testing stylesheets
+
+mapnik2 stylesheets were created n, n+1 for the styles listed above. e.g.:
+
+1.   world
+2.   world, roads
+3.   world, roads, admin-01234
+4.   world, roads, admin-01234, placenames-large
+5.   world, roads, admin-01234, placenames-large, placenames-capital
+
+# Creating Indexes
+
+_TODO:_ Add Links Regarding Index Creation
+
+*    110408 created btree index, 'idx\_capital' on planet\_osm\_point table.
+     Re-ran placenames-large-capital.xml stylesheet via nik2img to comapare
+     rendering times.    
+
+_NOTE:_ Initial rendering tests show that the placenames-large (and presumabely the placenames-capital)
+layer(s) add significant time to the rendering process. Maybe something to do with the indexes?
+
+# Snippets
+
+## nik2img.py
+
+    # Example nik2img.py usage
+    nik2img.py placenames-large.xml placenames-large.png -v -z 4 -c 13.398 52.5 --no-open &> placenames-large.log
+
+## Using VIM to grab a tag + contents:
+
+1.    Move cursor onto tag
+2.    v to enter visual
+3.    at to select tag + contents
+4.    y to yank
+5.    p to paste
+
+## PSQL Check Indexes
+
+    $ psql -d planet0304
+    planet0304# \di
+
+# Indexes
+
+## Admin Boundaries Index
+
+### EXPLAIN Results - No Index
+
+    planet0304=# EXPLAIN SELECT way, admin_level
+    FROM planet_osm_roads
+    where "boundary"='administrative'
+    and admin_level in ('0','1','2','3','4');
+
+					       QUERY PLAN                           
+    Seq Scan on planet_osm_roads  (cost=0.00..489551.79 rows=16502 width=2401)
+       Filter: ((boundary = 'administrative'::text) AND (admin_level = ANY ('{0,1,2,
+    3,4}'::text[])))
+    (2 rows)
+
+### Add Index
+
+    CREATE INDEX idx_bnd_admin
+    ON planet_osm_roads
+    USING btree(boundary, admin_level);
+
+### EXPLAIN Results - Post Index
+
+    planet0304=# EXPLAIN SELECT way, admin_level
+	FROM planet_osm_roads
+	where "boundary"='administrative'
+	and admin_level in ('0','1','2','3','4');
+						    QUERY PLAN
+
+     Bitmap Heap Scan on planet_osm_roads  (cost=390.24..55488.01 rows=16431 width=2401)
+       Recheck Cond: ((boundary = 'administrative'::text) AND (admin_level = ANY ('{0,1,2,3,4}'::text[])))
+       ->  Bitmap Index Scan on idx_bnd_admin  (cost=0.00..386.13 rows=16431 width=0)
+	     Index Cond: ((boundary = 'administrative'::text) AND (admin_level = ANY ('{0,1,2,3,4}'::text[])))
+    (4 rows)
+
+# Links of Interest
+
+## PostgreSQL Docs
+
+*    [Multi Column Index](http://www.postgresql.org/docs/9.0/static/indexes-multicolumn.html)
+*    [CREATE INDEX](http://www.postgresql.org/docs/current/static/sql-createindex.html)
+*    [Multiple Index Pros&Cons](http://www.postgresql.org/docs/9.0/static/indexes-bitmap-scans.html) 
