@@ -1,9 +1,4 @@
 ##### Organizational Membership #####
-#
-- First create organization with owners and a team (repositories fall under teams)
-- Everyone in owners has push, pull and admin rights
-- To get into organization view from profile just login into normal github account and click on 'Switch Context'
-
 # public keys and id_rsq.pub
 #
 - You can use your existing id_rsq.pub key from your normal github account to clone, push and pull changes to the repositories that we are all 'Team' members of in the organization
