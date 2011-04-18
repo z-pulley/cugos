@@ -127,3 +127,17 @@ element.
 use `Shift-O` from Normal mode. This automatically force VIM to enter Insert
 mode though, so press `ESC` to exit. After your newline has been created, you
 can use `p` to paste into it.
+
+# nik2img.py
+
+[nik2img](http://code.google.com/p/mapnik-utils/wiki/Nik2Img) can be used to
+render static images when given our mapnik mapfile. The example below will
+output an image of Seattle at a mid-range zoom level.
+
+    $ nik2img.py workshop_base.xml workshop_test1.png -v --no-open -c 122.3 -47.6 -z 11
+
+As you can see, we are telling nik2img to read the xml file `workshop_base.xml`
+and generate an image `workshop_test1.png`. Additional flags are being passed to
+produce verbose output, override the default behavior of opening an image, 
+and finally setting a center point and zoom level. Use `nik2img.py --help`
+for a full listing of flags and usage examples.
