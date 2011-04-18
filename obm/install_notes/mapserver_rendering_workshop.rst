@@ -14,5 +14,11 @@ We will be starting with a bare-bones .map file. This map file only renders a fe
 ______________
 To begin we will need to know 
 
+* mapnik osm2.xml
+* roger's files
+* Bonferr's mapserver utils
+* Mapserver documentation
+
+
 
 
