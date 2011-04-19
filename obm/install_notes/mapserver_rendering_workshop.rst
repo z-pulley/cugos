@@ -171,7 +171,7 @@ _________________________________
 
 1. Assuming you've cloned the github repository, set your SSH keys properly (see step 0 and 1 in last section) and copied \ **templateDIR** \ as your own workspace (see step 4 in last section), then let's start by looking at what \ **mapserver_springfling.html** \looks like on the OpenBaseMap server. Point your browser at this URL:
 
-    ``http://osm.openbasemap.org/mapservOSM/mapserver_springfling.html``
+    http://osm.openbasemap.org/mapservOSM/mapserver_springfling.html
 
     This map represents how the default mapfiles in \ **templateDIR** \are rendering currently. Not for long ;) Let's change them!
 
@@ -182,18 +182,22 @@ _________________________________
 
 3. Save your changes to the mapfile. Now for the git magic:
 
-    # Add or 'stage' your changes. Below I'm adding my edited \ **landuse.map** \file. Make sure to change \ **gc_mapfiles** \to your folder name. When staging changes \ ``git add`` \make sure you're only adding the things you've changed.
+    # Add or 'stage' your changes. Below I'm adding my edited \ **landuse.map** \file. Make sure to change \ **gc_mapfiles** \to your folder name. Also make sure you're only adding the things you've changed.
+
     ``$ git add gc_mapfiles/landuse.map``
 
     # Commit your changes and create a commit message with \ **-m** \switch.
-    ``$ git commit -m "I changed everything back to BLACK!``
-h
-    # In the commit command \ **-m** \ is the shortform switch for \ *'message'* \. \ **ALSO NEVER RUN A GIT COMMIT COMMAND LIKE THIS:** \ ``git commit -a -m "blah blah"`` \until you know what you are doing. The \ **-a** \ switch is saying commit EVERYTHING in the current working space. You might commit changes you never wanted pushed. I would stay away from this for now.
 
-    # Before you commited you can always view which files are untracked, modified or deleted using this shorthand git command:
+    ``$ git commit -m "I changed everything back to BLACK!``
+
+    # In the commit command \ **-m** \ is the shortform switch for \ *'message'* \. \ **NEVER RUN A GIT COMMIT COMMAND LIKE THIS:** \ ``git commit -a -m "blah blah"`` \until you know what you are doing. The \ **-a** \ switch is saying commit EVERYTHING in the current working space. You might commit changes you never wanted pushed. I would stay away from this for now.
+
+    # Before committing you can always view which files are untracked, modified or deleted using this shorthand git command:
+
     ``$ git status -s``
 
     # The output would look something like this assuming you've only changed the \ **landuse.map** \file and haven't commited yet. \ **M** means modified, \ **D** \ means deleted and \ **??** \means yo dude I'm not tracked yet:
+
     ``M landuse.map
     ?? fonts.lst
     ?? fonts/
@@ -203,11 +207,12 @@ h
     ?? shorelines.map``
 
     # Now for the fun part. Let's \ **push** \our changes back to the github repository:
+
     ``$ git push``
 
 4. If you go to the following URL and refresh the page you should see the folder you created with your \ **landuse.map** \file in it.
     
-    ``https://github.com/thebigspoon/mapservOSM``
+    https://github.com/thebigspoon/mapservOSM
 
 5. We have one more change to make before we can pull the changes to the OpenBaseMap server and view them. Make a copy of \ **mapserver_springfling.html** \in the root directory and give it a name prefixed by your initials, similar to what you did in step 4 of previous section. I'm going to call mine \ **gc_mapserver_springfling.html** \.
 
@@ -240,8 +245,8 @@ h
 9. Go to the github website in \ **step 4** \above to make sure the .html file appears. If you have username/password to the OpeBaseMap server then you'll want to ask me or someone else to teach you how to pull the changes down (it's not rocket science). If you don't have access to the server then ask me or someone else to do this for you.
          
 10. After \ **step 9** \is completed you can view your changes by going to the URL below -- make sure you change \ **mapserver_springfling** \to reflect the name of your edited \ **...springfling.html** \file.
-k
-    ``http://osm.openbasemap.org/mapservOSM/gc_mapserver_springfling.html``
+
+    http://osm.openbasemap.org/mapservOSM/gc_mapserver_springfling.html
 
 **Adding a New Layer to Landuse**
 _____________________________________
