@@ -12,13 +12,16 @@ We will be starting with a bare-bones .map file. This map file only renders a fe
 
 **Toolbox**
 ______________
-To begin we will need to know 
+To help us along the way we might want to refer to these:   
 
-* mapnik osm2.xml\ *located in the project folder* \.
-* Roger Andre's mapserver files located at ``/var/www`` on openbasemap server
-* `Bonfer's mapserver-utils project <http://mapserver-utils.googlecode.com/svn/trunk/>`_.
+* mapnik osm2.xml \ *located in the project folder* \.
+* Roger Andre's mapserver files located at ``/var/www/mapfiles/`` on openbasemap server
+* `Bonfert's mapserver-utils project <http://mapserver-utils.googlecode.com/svn/trunk/>`_.
 * `Mapserver mapfile syntax documentation <http://mapserver.org/mapfile/index.html>`_.
+* `Polymaps documentation <http://polymaps.org/>`_.
 
+**First Steps**
+________________
 
-
-
+1. Let's start by copying over the project workspace to a clean workspace
+    * Navigate to your home directory n   
