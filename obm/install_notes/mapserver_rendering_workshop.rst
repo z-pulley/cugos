@@ -20,12 +20,18 @@ To help us along the way we might want to refer to these:
 * `Polymaps documentation <http://polymaps.org/>`_.
 * Roger Andre's mapserver files located at \ ``/var/www/mapfiles/`` \on openbasemap server
 
-**ANNOYING WORKFLOW ALERT**
-
-We will be working remotely. That means you'll be downloading a git respository and posting changes back up to the server. Since the data and the software is on the server there will be an annoying latency between the edits you make and the time it takes for someone with admin rights to pull your changes to the server for the world to see. 
-
-**An Introduction...Skip Me If You Want**
+**First Steps**
 __________________________________________
+
+0. Ground zero. You'll need a github account and your SSH keys setup. If you don't know how to do this, then ask me (or someone near you) for help. But first try these very well written URL resources that can help you do these first steps:
+    
+    Setting up a github account:
+
+    ``http://help.github.com/linux-set-up-git/``
+
+    Setting up your public/private keys. What do you know! The same tutorial covers both!
+    
+    ``http://help.github.com/linux-set-up-git/``
 
 1. Clone the mapserver OSM workshop from github to your local machine::
     
@@ -53,9 +59,9 @@ __________________________________________
 
 There should be 3 files.
 
-* The \ **.git** \repository is nothing we're going to touch, but it's where git stores all it's magic.
-* The \ **templateDIR** \ holds all our mapserver mapfiles used for rendering. There are also fonts in this directory.
-* Finally, \ **mapserver_springfling.html** is the bare-bones javascript and html for the slippy  map...we're going to be using Polymaps instead of OpenLayers.
+    * The \ **.git** \repository is nothing we're going to touch, but it's where git stores all it's magic.
+    * The \ **templateDIR** \ holds all our mapserver mapfiles used for rendering. There are also fonts in this directory.
+    * Finally, \ **mapserver_springfling.html** is the bare-bones javascript and html for the slippy  map...we're going to be using Polymaps instead of OpenLayers.
 
 4. Copy the \ **templateDIR** \within mapservOSM folder and give it a specific name such as \ **your initials + mapfiles** \. Mine will be \ **gc_mapfiles** \.::
 
@@ -75,9 +81,9 @@ There should be 3 files.
 
 There should be 7 files here.
 
-* The \ **fonts** \ files are self explanatory
-* osm2.xml is used by the renderer \ **mapnik** \to apply styles to OSM data. This is the official OSM renderer. It's helpful to see what that style sheet is querying on in the OSM database because, as you'll see, OSM data can be hairy to work with
-* Anything with the \ **.map** \extentsion is our mapserver files
+    * The \ **fonts** \ files are self explanatory
+    * osm2.xml is used by the renderer \ **mapnik** \to apply styles to OSM data. This is the official OSM renderer. It's helpful to see what that style sheet is querying on in the OSM database because, as you'll see, OSM data can be hairy to work with
+    * Anything with the \ **.map** \extentsion is our mapserver files
 
 6. Let's look quickly at two .map files so we understand what we're dealing with. Open \ **landuse.map** \in your favorite text editor::
 
@@ -114,10 +120,10 @@ There should be 7 files here.
 
 You can see that this land use file only contains layers. Each layer has a number of key/value pairs that define it's properties. Take note of a few things:
 
-* Each layer has CONNECTION information about the OSM database
-* Each layer has it's own projection defined
-* The key \ **DATA** \holds our select statement for querying the OSM database
-* The key \ **EXPRESSION** \is our branching logic (think about it like a switch statement) that allows us to apply a particular style to a query value
+    * Each layer has CONNECTION information about the OSM database
+    * Each layer has it's own projection defined
+    * The key \ **DATA** \holds our select statement for querying the OSM database
+    * The key \ **EXPRESSION** \is our branching logic (think about it like a switch statement) that allows us to apply a particular style to a query value
 
 7. So how do our layer .map files get into a map. Now take a look at \ **main_osm.map** \. This document contains our \ **MAP** \object and it's particular attributes::
 
