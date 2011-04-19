@@ -14,17 +14,18 @@ We will be starting with a bare-bones \ **.map** \file. This map file only rende
 ______________
 To help us along the way we might want to refer to these:
 
-* mapnik osm2.xml \ *located in the project folder* \.
+* mapnik osm2.xml \ **located in our github project folder** \.
 * `Bonfert's mapserver-utils project <http://mapserver-utils.googlecode.com/svn/trunk/>`_.
 * `Mapserver mapfile syntax documentation <http://mapserver.org/mapfile/index.html>`_.
 * `Polymaps documentation <http://polymaps.org/>`_.
-* Roger Andre's mapserver files located at ``/var/www/mapfiles/`` on openbasemap server
+* Roger Andre's mapserver files located at \ ``/var/www/mapfiles/`` \on openbasemap server
 
 **ANNOYING WORKFLOW ALERT**
+
 We will be working remotely. That means you'll be downloading a git respository and posting changes back up to the server. Since the data and the software is on the server there will be an annoying latency between the edits you make and the time it takes for someone with admin rights to pull your changes to the server for the world to see. 
 
-**First Steps**
-________________
+**An Introduction...Skip Me If You Want**
+__________________________________________
 
 1. Clone the mapserver OSM workshop from github to your local machine::
     
@@ -51,9 +52,10 @@ ________________
     drwxr-xr-x 3 gcorradini gcorradini 4.0K 2011-04-18 21:48 templateDIR
 
 There should be 3 files.
+
 * The \ **.git** \repository is nothing we're going to touch, but it's where git stores all it's magic.
 * The \ **templateDIR** \ holds all our mapserver mapfiles used for rendering. There are also fonts in this directory.
-* Finally,\ **mapserver_springfling.html** is the bare-bones javascript and html for the slippy  map...we're going to be using Polymaps instead of OpenLayers.
+* Finally, \ **mapserver_springfling.html** is the bare-bones javascript and html for the slippy  map...we're going to be using Polymaps instead of OpenLayers.
 
 4. Copy the \ **templateDIR** \within mapservOSM folder and give it a specific name such as \ **your initials + mapfiles** \. Mine will be \ **gc_mapfiles** \.::
 
@@ -72,11 +74,12 @@ There should be 3 files.
     -rw-r--r-- 1 gcorradini gcorradini  906 2011-04-18 21:48 shorelines.map
 
 There should be 7 files here.
-* The\ **fonts** \ files are self explanatory
-* osm2.xml is used by the renderer\ **mapnik** \to apply styles to OSM data. This is the official OSM renderer. It's helpful to see what that style sheet is querying on in the OSM database because, as you'll see, OSM data can be hairy to work with
-* Anything with the\ **.map** \extentsion is our mapserver files
 
-6. Let's look quickly at two .map files so we understand what we're dealing with. Open\ **landuse.map** \in your favorite text editor::
+* The \ **fonts** \ files are self explanatory
+* osm2.xml is used by the renderer \ **mapnik** \to apply styles to OSM data. This is the official OSM renderer. It's helpful to see what that style sheet is querying on in the OSM database because, as you'll see, OSM data can be hairy to work with
+* Anything with the \ **.map** \extentsion is our mapserver files
+
+6. Let's look quickly at two .map files so we understand what we're dealing with. Open \ **landuse.map** \in your favorite text editor::
 
         # landuse.map
 
@@ -110,12 +113,13 @@ There should be 7 files here.
         END
 
 You can see that this land use file only contains layers. Each layer has a number of key/value pairs that define it's properties. Take note of a few things:
+
 * Each layer has CONNECTION information about the OSM database
 * Each layer has it's own projection defined
-* The key\ **DATA** \holds our select statement for querying the OSM database
-* The key\ **EXPRESSION** \is our branching logic (think about it like a switch statement) that allows us to apply a particular style to a query value
+* The key \ **DATA** \holds our select statement for querying the OSM database
+* The key \ **EXPRESSION** \is our branching logic (think about it like a switch statement) that allows us to apply a particular style to a query value
 
-7. So how do our layer .map files get into a map. Now take a look at\ **main_osm.map** \. This document contains our\ **MAP** \object and it's particular attributes::
+7. So how do our layer .map files get into a map. Now take a look at \ **main_osm.map** \. This document contains our \ **MAP** \object and it's particular attributes::
 
 
         MAP
