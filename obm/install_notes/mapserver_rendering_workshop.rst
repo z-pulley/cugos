@@ -8,7 +8,7 @@ This guide will help us understand how to render OSM data with Mapserver.
 Here is a glimpse of what a final mapserver-rendered product can look like (this interpretation was brought to us by the GIS rock stars Roger Andre and Thomas Bonfort):
 http://www.openbasemap.org/seattle_osm.html
 
-We will be starting with a bare-bones\ **.map** \file. This map file only renders a few layers such as borders, major highways and some landuse. Our goal will be to expand on this basic map file and create alternative renderings.
+We will be starting with a bare-bones \ **.map** \file. This map file only renders a few layers such as borders, major highways and some landuse. Our goal will be to expand on this basic map file and create alternative renderings.
 
 **Toolbox**
 ______________
@@ -20,8 +20,8 @@ To help us along the way we might want to refer to these:
 * `Polymaps documentation <http://polymaps.org/>`_.
 * Roger Andre's mapserver files located at ``/var/www/mapfiles/`` on openbasemap server
 
-.. ANNOYING WORKFLOW ALERT::
-    We will be working remotely. That mean you'll be downloading a git respository and posting changes back up to the server. Since the data and the software is on the server there will be an annoying latency between the edits you make and the time it takes for someone with admin rights to pull your changes to the server for the world to see. 
+**ANNOYING WORKFLOW ALERT**
+We will be working remotely. That means you'll be downloading a git respository and posting changes back up to the server. Since the data and the software is on the server there will be an annoying latency between the edits you make and the time it takes for someone with admin rights to pull your changes to the server for the world to see. 
 
 **First Steps**
 ________________
@@ -51,11 +51,11 @@ ________________
     drwxr-xr-x 3 gcorradini gcorradini 4.0K 2011-04-18 21:48 templateDIR
 
 There should be 3 files.
-* The\ **.git** \repository is nothing we're going to touch, but it's where git stores all it's magic.
-* The\ **templateDIR** \ holds all our mapserver mapfiles used for rendering. There are also fonts in this directory.
+* The \ **.git** \repository is nothing we're going to touch, but it's where git stores all it's magic.
+* The \ **templateDIR** \ holds all our mapserver mapfiles used for rendering. There are also fonts in this directory.
 * Finally,\ **mapserver_springfling.html** is the bare-bones javascript and html for the slippy  map...we're going to be using Polymaps instead of OpenLayers.
 
-4. Copy the\ **templateDIR** \within mapservOSM folder and give it a specific name such as\ **your initials + mapfiles** \. Mine will be\ **gc_mapfiles** \.::
+4. Copy the \ **templateDIR** \within mapservOSM folder and give it a specific name such as \ **your initials + mapfiles** \. Mine will be \ **gc_mapfiles** \.::
 
     $ cp -r templateDIR gc_mapfiles
 
