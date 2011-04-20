@@ -303,7 +303,7 @@ _____________________________________
             </Datasource>
         </Layer>
 
-4. Next I'm going to copy an existing mapfile layer from my project and do some cutting and pasting. Let's make a copy of \ **landuse.map** \ and call it \ **res_buildings.map** \. 
+4. Next I'm going to copy an existing mapfile from my project and do some cutting and pasting. Let's make a copy of \ **landuse.map** \ and call it \ **res_buildings.map** \. 
 
     ``$ cp landuse.map res_buildings.map``
 
@@ -343,16 +343,37 @@ _____________________________________
 
 6. The next steps are straightfoward. Let's scan the \ **LAYER** \object attributes top-down and look for things we're going to have to change to accommodate our new layer.
     
-7. It looks like we're going to make edits to the \ **NAME, DATA, CLASSITEM, MAXSCALEDENOM AND CLASS** \attributes. Some of these are going to be easy while others, namely \ **DATA, CLASS** \attributes are going to be harder. 
+7. It looks like we're going to make edits to the \ **NAME, DATA, CLASSITEM, MAXSCALEDENOM AND CLASS** \attributes. Some of these are going to be easy while others, namely \ **DATA, CLASS** \attributes are going to be harder. If we want \ **CLASS LABELS** \then it's going to be even tougher. 
 
-8. Change the \ **NAME, MAXSCALEDENOM** \attributes to look like this::
+8. Change the \ **res_building.map** \file to look like this::
 
-    NAME "res_buildings"
-    ...
-    MAXSCALEDENOM 70000
+        LAYER
+            TYPE POLYGON
+            STATUS DEFAULT
 
-9. Delete all \ **EXPRESSION** \ variables from the \ **CLASS** \attributes so they look like this:
+            PROJECTION
+                "init=epsg:900913"
+            END 
 
-10.  
+            NAME "resbuildings"
+            GROUP "default"
+            CONNECTIONTYPE POSTGIS
+            CONNECTION "host=localhost dbname=planet0304 user=gcorradini"
 
+            DATA "way from (select way, osm_id, name from planet_osm_polygon where (building is not null and building not in ('no','station','supermarket') and (railway is null or railway != 'station') and (amenity is null or amenity != 'place_of_worship')) or aeroway = 'terminal') as foo using unique osm_id using srid=900913"
+
+            LABELITEM "name"
+            PROCESSING "CLOSE_CONNECTION=DEFER"
+            MAXSCALEDENOM 1000010
+
+            CLASS
+                STYLE
+                    COLOR "#DADEAD"
+                END 
+            END 
+
+        END
+            
+
+9. Finalize things by add this new layer the \ **main_osm.map** \file in the \ **INCLUDE** \section. 
     
