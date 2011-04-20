@@ -244,7 +244,7 @@ _________________________________
 
     http://osm.openbasemap.org/mapservOSM/gc_mapserver_springfling.html
 
-**Adding a New Layer to Landuse**
+**Adding a New Layer**
 _____________________________________
 
 1. Let's say we really wanted to add a buildings layer to the mapserver files. How would we go about investigating that?. The first step (always the first step for me at least) is to go straight to the official renderer \ **mapnik's** \osm2.xml stylesheet. Open the osm2.xml in a text editor.
