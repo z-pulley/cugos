@@ -12,7 +12,7 @@ We will be starting with a bare-bones \ **.map** \file. This map file only rende
 
 **Assumptions**
 ________________
-This tutorial is meant for all but written in a way that might be biased. I'm working on Linux Ubuntu with the terminal text editor VIM. Therefore my text editing and directory commands might confuse you. Hopefully the directions give enough context that you can ignore the way I'm doing things and edit the text files and move through directories in your normal way. Though I do recommend learning VIM or emacs because they make text editing super duper fun and prepare you to work remotely!
+I'm working on Linux Ubuntu with the terminal text editor VIM. Therefore my text editing and directory commands might confuse you. Hopefully the directions give enough context that you can ignore my way and go about business your normal way. Though I do recommend learning VIM or emacs because they make text editing super duper fun and prepare you to work remotely!
 
 **Toolbox**
 ______________
@@ -27,25 +27,19 @@ To help us along the way we might want to refer to these:
 **First Steps**
 __________________________________________
 
-0. Ground zero. You'll need a github account and your SSH keys setup. If you don't know how to do this, then ask me (or someone near you) for help. But first try these very well written URL resources that can help you do these first steps:
+0. Ground zero. You'll need a github account and your SSH keys setup. If you don't know how to do this, then ask me (or someone near you) for help. But first try these very well written URL resources that can help you resolve these first steps:
     
-    Setting up a github account:
+    # Setting up a github account:
 
     ``http://help.github.com/linux-set-up-git/``
 
-    Setting up your public/private keys. What do you know! The same tutorial covers both!
+    # Setting up your public/private keys. What do you know! The same tutorial covers both!
     
     ``http://help.github.com/linux-set-up-git/``
 
-1. Clone the mapserver OSM workshop from github to your local machine::
+1. Clone the mapserver OSM workshop from github to your local machine
     
-     $ git clone git@github.com:thebigspoon/mapservOSM.git
-     Initialized empty Git repository in /home/gcorradini/REPOS/GIT/mapservOSM/.git/
-     remote: Counting objects: 22, done.
-     remote: Compressing objects: 100% (22/22), done.
-     remote: Total 22 (delta 1), reused 0 (delta 0)
-     Receiving objects: 100% (22/22), 1.75 MiB | 1.03 MiB/s, done.
-     Resolving deltas: 100% (1/1), dono
+     ``$ git clone git@github.com:thebigspoon/mapservOSM.git``
 
 2. \ **cd** \into the mapservOSM directory
 
@@ -67,9 +61,9 @@ There should be 3 files.
     * The \ **templateDIR** \ holds all our mapserver mapfiles used for rendering. There are also fonts in this directory.
     * Finally, \ **mapserver_springfling.html** is the bare-bones javascript and html for the slippy  map...we're going to be using Polymaps instead of OpenLayers.
 
-4. Copy the \ **templateDIR** \within mapservOSM folder and give it a specific name such as \ **your initials + mapfiles** \. Mine will be \ **gc_mapfiles** \.::
+4. Copy the \ **templateDIR** \within mapservOSM folder and give it a specific name such as \ **your initials + mapfiles** \. Mine will be \ **gc_mapfiles** \:
 
-    $ cp -r templateDIR gc_mapfiles
+    ``$ cp -r templateDIR gc_mapfiles``
 
 5. cd into the copied mapfile folder and take a peek at the contents::
 
@@ -86,10 +80,10 @@ There should be 3 files.
 There should be 7 files here.
 
     * The \ **fonts** \ files are self explanatory
-    * osm2.xml is used by the renderer \ **mapnik** \to apply styles to OSM data. This is the official OSM renderer. It's helpful to see what that style sheet is querying on in the OSM database because, as you'll see, OSM data can be hairy to work with
+    * osm2.xml is used by the renderer \ **Mapnik** \to apply styles to OSM data. As far as i know Mapnik is the official OSM renderer. It's helpful to look at this style sheet to see how the OSM data is being queried because, as you'll see, OSM data can be hard to deal with
     * Anything with the \ **.map** \extentsion is our mapserver files
 
-6. Let's look quickly at two .map files so we understand what we're dealing with. Open \ **landuse.map** \in your favorite text editor::
+6. Let's look quickly at two \ **.map** \files so we understand what we're dealing with. Open \ **landuse.map** \in your favorite text editor::
 
         # landuse.map
 
@@ -123,15 +117,14 @@ There should be 7 files here.
             END 
         END
 
-You can see that this land use file only contains layers. Each layer has a number of key/value pairs that define it's properties. Take note of a few things:
+You can see that this land use file only contains layers. Each layer has a number of attributes that define properties. Take note of a few things:
 
     * Each layer has CONNECTION information about the OSM database
     * Each layer has it's own projection defined
     * The key \ **DATA** \holds our select statement for querying the OSM database
     * The key \ **EXPRESSION** \is our branching logic (think about it like a switch statement) that allows us to apply a particular style to a query value
 
-7. So how do our layer .map files get into a map. Now take a look at \ **main_osm.map** \. This document contains our \ **MAP** \object and it's particular attributes::
-
+7. So how do our layer .map files get into a map? Take a look at \ **main_osm.map** \. This document contains our \ **MAP** \object and it's particular attributes. The most important thing to note here is that we reference the mapfile of each layer with an \ **INCLUDE** \statement::
 
         MAP
                 NAME  'main_osm'
@@ -164,7 +157,6 @@ You can see that this land use file only contains layers. Each layer has a numbe
 
         END
 
-The most important thing to note here is that we reference the mapfile of each layer with an \ **INCLUDE** \statement
 
 **Example Rendering Workflow**
 _________________________________
@@ -188,13 +180,13 @@ _________________________________
 
     # The output would look something like this assuming you've only changed the \ **landuse.map** \file and haven't added or committed yet. \ **M** means modified, \ **D** \ means deleted, \ **A** means added and \ **??** \means a file is not tracked yet:
 
-    ``M landuse.map
-    ?? fonts.lst
-    ?? fonts/
-    ?? main_osm.map
-    ?? osm2.xml
-    ?? roadsfar.map
-    ?? shorelines.map``
+    ``M landuse.map``
+    ``?? fonts.lst``
+    ``?? fonts/``
+    ``?? main_osm.map``
+    ``?? osm2.xml``
+    ``?? roadsfar.map``
+    ``?? shorelines.map``
 
     # Add or 'stage' the files you've changed. Below I'm staging my whole workspace folder. Make sure to change \ **gc_mapfiles** \to your folder name.
 
@@ -205,9 +197,10 @@ _________________________________
     ``$ git commit -m "I changed everything back to BLACK!``
 
     # Before you push your changes make sure you do a \ **pull** \to get the most recent changes from others. If you get a conflict error, well, start Googling solutions
+
     ``$ git pull``
 
-    # \ **TIP > NEVER RUN A GIT COMMIT COMMAND LIKE THIS:** \ ``git commit -a -m "blah blah"`` \until you know what you are doing. The \ **-a** \ switch is saying commit EVERYTHING in the current working space. You might commit changes you never wanted pushed. Stay away from this for now.
+    # \ **TIP > NEVER RUN A GIT COMMIT COMMAND LIKE THIS:** \ ``git commit -a -m "blah blah"`` \until you know what you are doing. The \ **-a** \ switch is saying commit EVERYTHING in the current working space. You might commit changes you never wanted pushed.
 
     # Now for the fun part. Let's \ **push** \our changes back to the github repository:
 
@@ -225,7 +218,7 @@ _________________________________
 
     ``.add(po.image().url('http://osm.openbasemap.org/cgi-bin/mapserv?map=mapservOSM/gc_mapfiles/main_osm.map&mode=tile&tile={X}+{Y}+{Z}'))``
 
-7. You'll want to change the directory name in that line of code \ **gc_mapfiles** \to your mapfile directoy name. Make that edit and save the file. Or change the <Title> if you want something a little more personal.
+7. You'll want to change the directory name \ **(gc_mapfiles)** \in the code to your mapfile directoy name. Make that edit and save the file. Or change the <Title> if you want something a little more personal.
 
 8. Now follow all the git steps in \ **step 3** \ above to stage,commit and push only the newly edited \ **..springfling.html** \file. Here's mine::
 
@@ -377,3 +370,4 @@ _____________________________________
 
 9. Finalize things by add this new layer the \ **main_osm.map** \file in the \ **INCLUDE** \section. 
     
+10. Finally, follow the steps for staging, commiting and pushing your changes back to the server and ask someone to pull them down for you to view.
