@@ -1,0 +1,152 @@
+OSM Rendering - A Look at the Mapnik Toolbox
+============================================
+
+# Overview
+
+*   There are _many_ choices when it comes to picking a renderer
+    for your OSM data. The OSM wiki [lists](http://wiki.openstreetmap.org/wiki/Rendering) over 20 different rendering tools.
+
+*   Mapnik has emerged as the front-runner.
+
+*   Used to render the main map at <http://openstreetmap.org>
+
+*   Supports a variety of data formats: ESRI Shapefile, PostGIS, osm.xml,
+    raster datasets.
+
+# Tile Servers
+
+These projects can intercept tile requests from a browser and return either a
+pre-rendered tile from the filesystem (cache hit) or render a tile on-the-fly
+using mapnik (cache miss). The resulting tile can then be cached onto disk.
+These tools are commonly used to power 'slippy maps'.
+
+## TileLite
+
+**Project Homepage:** <http://wiki.openstreetmap.org/wiki/Mod_tile>
+
+*   Both fast and easy-to-install.
+
+    $ sudo easy_install tilelite
+
+*   Includes a server which can be quickly deployed for development purposes.
+
+    $ liteserv.py path_to_your.xml
+
+*   Can be run in a production environment via Apache + mod-wsgi.
+
+*   Hooks to [Cascadenik](https://github.com/mapnik/Cascadenik/wiki/Cascadenik)
+    for rendering of mml files.
+
+## TileStache
+
+**Project Homepage:** <http://tilestache.org/> 
+
+**Example:** <http://polymaps.org/ex/population.html>
+
+*   In addtion to mapnik mapfiles, also serves a variety of other datasources:
+    locally cache your friends cache {via proxy}, ESRI Shapefiles, PostgreSQL
+
+*   Can produce output other then standard image tiles {eg Vector Tiles}
+
+    {
+      "type": "FeatureCollection",
+      "features": [
+	{
+	  "geometry": {
+	    "type": "MultiPolygon",
+	    "coordinates": [
+	      [
+		[
+		  [
+		    -122.973093,
+		    47.969842
+		  ],...
+		  [
+		    -122.973093,
+		    47.969842
+		  ]
+		]
+	      ]
+	    ]
+	  },
+	  "type": "Feature",
+	  "properties": {
+	    "property_s": "USFS",
+	    "juris_name": "Olympic National Forest"
+	  },
+	  "id": 1280
+	}
+      ]
+    }
+
+*   Support for metatiles
+
+## mod_tile + renderd
+
+**Project Homepage:** <http://wiki.openstreetmap.org/wiki/Mod_tile>
+
+**Example:** <http://osm.openbasemap.org/mapnik_workshop/viewer/>
+
+*   Custom Apache module
+
+*   Rich feature-set: Tile Expirey, definable number of threads and max clients
+
+*   Support for metatiles
+
+*   Difficult initial setup, poor documentation. 
+    **NOTE:** [CUGOS Notes On mod_tile configuration](https://github.com/z-pulley/cugos/blob/master/obm/install_notes/mod_tile_install.mkd)
+
+# Python Tools
+
+In addition to fully-fledged Tile Server packages, there are a few python
+utilities which have become standards for rendering static images with mapnik.
+
+## nik2img.py
+
+**Project Homepage:** <http://code.google.com/p/mapnik-utils/wiki/Nik2Img>
+
+*   Useful for testing changes in/between stylesheets.
+
+*   Verbose output helpful for understanding which layers and rules are
+    being rendered for a given map extent and zoom level.
+
+    Step: 1 // --> Nik2img starting...
+    Step: 2 // --> Format: png
+    Step: 3 // --> Loading mapfile...
+    Step: 4 // --> Loaded no_roads.xml...
+    Step: 5 // --> Setting Map view...
+    Step: 6 // --> Zoom to extent of all layers: "Box2d(-57088996.2831,-56189422.7108,57088996.2831,19929239.0)"
+    Step: 7 // --> Finished setting extents...
+    Loading map took...  0.0122 seconds
+    Step: 8 // --> SRS: +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over
+    Step: 9 // --> Map extent: Box2d(-57088996.2831,-56189422.7108,57088996.2831,19929239.0)
+    Step: 10 // --> Map long/lat bbox: Box2d(-512.839179162,-89.9828938613,512.839179162,84.9665122843)
+    Step: 11 // --> Map center: Coord(0.0,-18130091.8554)
+    Step: 12 // --> Map long/lat center: Coord(0.0,-2.50819078854)
+    Step: 13 // --> Map scale denominator: 679630908.133
+    Step: 14 // --> Extent of all layers: Box2d(-20037508.0,-56189422.7108,20037508.0,19929239.0)
+    Step: 15 // --> Long/lat extent of all layers: Box2d(-179.999996921,-89.9828938613,179.999996921,84.9665122843)
+    Step: 16 // --> Long/lat center of all layers: Coord(0.0,-2.50819078854)
+    Step: 17 // --> Layers intersecting map: [world, coast-poly, builtup, necountries, nepopulated, buildings]
+    Step: 18 // --> At current scale of '190296.654277'...
+    Step: 19 // --> Layer 'world' has 1 active rule(s) in styles: 'world'
+    Step: 20 // --> Layer 'coast-poly' is NOT visible
+    Step: 21 // --> Layer 'builtup' is NOT visible
+    Step: 22 // --> Layer 'necountries' is NOT visible
+    Step: 23 // --> Layer 'nepopulated' is NOT visible
+    Step: 24 // --> Layer 'buildings' is NOT visible
+    Step: 25 // --> Starting rendering...
+    Rendering image took...  1.9273 seconds
+    Step: 26 // --> Finished rendering map to... no_roads.png
+    Total Nik2img run time: 1.9614 seconds
+
+## generate_tiles.py
+
+**Project Homepage:** <http://svn.openstreetmap.org/applications/rendering/mapnik/generate_tiles.py>
+
+*   Given a bbox, mapnik mapfile, output directory, min/max zoom...
+    render tiles in a standard z/x/y tile scheme.
+
+*   Can be used to seed a cache for use by a tile-server.
+
+*   Suitable as a stand-alone solution for small spatial extents with static data.
