@@ -27,7 +27,7 @@ To help us along the way we might want to refer to these:
 **First Steps**
 __________________________________________
 
-0. Ground zero. \ **REVISE THIS LATER NOT SURE HOW TRUE** \You'll need a github account and your SSH keys setup. If you don't know how to do this, then ask me (or someone near you) for help. But first try these very well written URL resources that can help you do these first steps:
+0. Ground zero. You'll need a github account and your SSH keys setup. If you don't know how to do this, then ask me (or someone near you) for help. But first try these very well written URL resources that can help you do these first steps:
     
     Setting up a github account:
 
@@ -173,30 +173,20 @@ _________________________________
 
     http://osm.openbasemap.org/mapservOSM/mapserver_springfling.html
 
-    This map represents how the default mapfiles in \ **templateDIR** \are rendering currently. Not for long ;) Let's change them!
+    This map represents how the default mapfiles in \ **templateDIR** \are rendering currently. Not for long. Let's change that.
 
-2. Let's make an easy color edit to understand the git push and pull workflow. Then we'll move onto a more advanced revision. Open the \ **landuse.map** \file in your favorite text editor and replace all color attributes with the color black \ **#FFFFFF** \. In VIM you could do it in one fell swoop like this:
+2. Let's make a color edit to understand the git push and pull workflow. Then we'll move onto a more advanced revision. Open the \ **landuse.map** \file in your favorite text editor and replace all color attributes with the color black \ **#000000** \. In VIM you could do it in one fell swoop like this:
 
-    ``:%s/COLOR.*$/COLOR "#FFFFFF"/g`` 
+    ``:%s/COLOR.*$/COLOR "#000000"/g`` 
 
 
-3. Save your changes to the mapfile. Now for the git magic:
+3. Save your changes to the mapfile. Now we'll turn to git:
 
-    # Add or 'stage' your changes. Below I'm adding my edited \ **landuse.map** \file. Make sure to change \ **gc_mapfiles** \to your folder name. Also make sure you're only adding the things you've changed.
-
-    ``$ git add gc_mapfiles/landuse.map``
-
-    # Commit your changes and create a commit message with \ **-m** \switch.
-
-    ``$ git commit -m "I changed everything back to BLACK!``
-
-    # In the commit command \ **-m** \ is the shortform switch for \ *'message'* \. \ **NEVER RUN A GIT COMMIT COMMAND LIKE THIS:** \ ``git commit -a -m "blah blah"`` \until you know what you are doing. The \ **-a** \ switch is saying commit EVERYTHING in the current working space. You might commit changes you never wanted pushed. I would stay away from this for now.
-
-    # Before committing you can always view which files are untracked, modified or deleted using this shorthand git command:
+    # Before staging and commiting your changes you can always view which files are untracked, modified or deleted using this shorthand git command:
 
     ``$ git status -s``
 
-    # The output would look something like this assuming you've only changed the \ **landuse.map** \file and haven't commited yet. \ **M** means modified, \ **D** \ means deleted and \ **??** \means yo dude I'm not tracked yet:
+    # The output would look something like this assuming you've only changed the \ **landuse.map** \file and haven't added or committed yet. \ **M** means modified, \ **D** \ means deleted, \ **A** means added and \ **??** \means a file is not tracked yet:
 
     ``M landuse.map
     ?? fonts.lst
@@ -205,6 +195,19 @@ _________________________________
     ?? osm2.xml
     ?? roadsfar.map
     ?? shorelines.map``
+
+    # Add or 'stage' the files you've changed. Below I'm staging my whole workspace folder. Make sure to change \ **gc_mapfiles** \to your folder name.
+
+    ``$ git add gc_mapfiles/``
+
+    # Commit your changes and create a commit message with \ **-m** \switch.
+
+    ``$ git commit -m "I changed everything back to BLACK!``
+
+    # Before you push your changes make sure you do a \ **pull** \to get the most recent changes from others. If you get a conflict error, well, start Googling solutions
+    ``$ git pull``
+
+    # \ **TIP > NEVER RUN A GIT COMMIT COMMAND LIKE THIS:** \ ``git commit -a -m "blah blah"`` \until you know what you are doing. The \ **-a** \ switch is saying commit EVERYTHING in the current working space. You might commit changes you never wanted pushed. Stay away from this for now.
 
     # Now for the fun part. Let's \ **push** \our changes back to the github repository:
 
@@ -222,7 +225,7 @@ _________________________________
 
     ``.add(po.image().url('http://osm.openbasemap.org/cgi-bin/mapserv?map=mapservOSM/gc_mapfiles/main_osm.map&mode=tile&tile={X}+{Y}+{Z}'))``
 
-7. You'll want to change the directory name in that line of code \ **gc_mapfiles** \to your mapfile directoy name. Make that edit and save the file. Or change the Title if you want something a little more personal.
+7. You'll want to change the directory name in that line of code \ **gc_mapfiles** \to your mapfile directoy name. Make that edit and save the file. Or change the <Title> if you want something a little more personal.
 
 8. Now follow all the git steps in \ **step 3** \ above to stage,commit and push only the newly edited \ **..springfling.html** \file. Here's mine::
 
@@ -234,7 +237,7 @@ _________________________________
          create mode 100644 gc_mapserver_springfling.html
         $ git push
         Counting objects: 4, done.
-        Delta compression using up to 8 threads.
+        Delta compression using up to 8 threads.F
         Compressing objects: 100% (3/3), done.
         Writing objects: 100% (3/3), 1014 bytes, done.
         Total 3 (delta 0), reused 0 (delta 0)
@@ -244,12 +247,112 @@ _________________________________
 
 9. Go to the github website in \ **step 4** \above to make sure the .html file appears. If you have username/password to the OpeBaseMap server then you'll want to ask me or someone else to teach you how to pull the changes down (it's not rocket science). If you don't have access to the server then ask me or someone else to do this for you.
          
-10. After \ **step 9** \is completed you can view your changes by going to the URL below -- make sure you change \ **mapserver_springfling** \to reflect the name of your edited \ **...springfling.html** \file.
+10. After \ **step 9** \is completed you can view your changes by going to the URL below -- make sure you change \ **gc_mapserver_springfling** \to reflect the name of your edited \ **...springfling.html** \file.
 
     http://osm.openbasemap.org/mapservOSM/gc_mapserver_springfling.html
 
 **Adding a New Layer to Landuse**
 _____________________________________
 
+1. Let's say we really wanted to add a buildings layer to the mapserver files. How would we go about investigating that?. The first step (always the first step for me at least) is to go straight to the official renderer \ **mapnik's** \osm2.xml stylesheet. Open the osm2.xml in a text editor.
 
 
+2. We are using osm2.xml to basically lookup what database column names would be mapped to an attribute like 'buildings'. There could be many as we'll see and the queries could range in complexity. In the osm2.xml stylesheet do a search for "building" or variations of the word. In VIM we would do something like this using regexs:
+
+    ``/.*building.*``
+
+3. I don't know about you, but I found a few. For the purposes of this section I'm going to stick with the layer descripton on \ **lines 4722-4810** \. It looks like we're going to target mostly residential buildngs here::
+
+        <!-- Render the other building types. Some sql filtering is needed to exclude
+             any type not already specifically rendered in buildings-lz. -->
+        <Layer name="buildings" status="on" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over">
+            <StyleName>buildings</StyleName>
+            <Datasource>
+              <Parameter name="table">
+              (select way,aeroway,
+                case
+                 when building in ('residential','house','garage','garages') then 'INT-light'::text
+                 else building
+                end as building
+               from planet_osm_polygon
+               where (building is not null
+                 and building not in ('no','station','supermarket')
+                 and (railway is null or railway != 'station')
+                 and (amenity is null or amenity != 'place_of_worship'))
+                  or aeroway = 'terminal'
+               order by z_order,way_area desc) as buildings
+              </Parameter>
+              <!--
+        Settings for your postgres setup.
+
+        Note: feel free to leave password, host, port, or use blank
+        -->
+
+        <Parameter name="type">postgis</Parameter>
+        <Parameter name="password">gis</Parameter>
+        <Parameter name="host">localhost</Parameter>
+        <Parameter name="port">5432</Parameter>
+        <Parameter name="user">cugos</Parameter>
+        <Parameter name="dbname">planet0304</Parameter>
+        <!-- this should be 'false' if you are manually providing the 'extent' -->
+        <Parameter name="estimate_extent">false</Parameter>
+        <!-- manually provided extent in epsg 900913 for whole globe -->
+        <!-- providing this speeds up Mapnik database queries -->
+        <Parameter name="extent">-20037508,-19929239,20037508,19929239</Parameter>
+
+            </Datasource>
+        </Layer>
+
+4. Next I'm going to copy an existing mapfile layer from my project and do some cutting and pasting. Let's make a copy of \ **landuse.map** \ and call it \ **res_buildings.map** \. 
+
+    ``$ cp landuse.map res_buildings.map``
+
+5. Now delete everything but the first \ **LAYER** \object so your \ **res_buildings.map** \file looks like this::
+
+        # res_buildings.map
+
+        LAYER
+            TYPE POLYGON
+            STATUS DEFAULT
+            PROJECTION
+                "init=epsg:900913"
+            END 
+            NAME "landuse_layer1"
+            GROUP "default"
+            CONNECTIONTYPE POSTGIS
+            CONNECTION "host=localhost dbname=planet0304 user=gcorradini"
+            DATA "way from (select way,osm_id ,landuse, name from planet_osm_polygon where landuse is not null) as foo using unique osm_id using srid=900913"
+            PROCESSING "CLOSE_CONNECTION=DEFER"
+            CLASSITEM "landuse"
+            MAXSCALEDENOM 1000010
+            CLASS
+                EXPRESSION ('[landuse]'='industrial' or '[landuse]'='commercial' or '[landuse]'='airport' or '[landuse]'='brownfield' or '[landuse]'='military' or '[landuse]'='railway')
+                STYLE
+                    COLOR "#EBE5D9"
+                END 
+             
+            END 
+            CLASS
+                EXPRESSION ('[landuse]'='residential')
+                STYLE
+                    COLOR "#F6F1E6"
+                END 
+            END 
+        END
+
+
+6. The next steps are straightfoward. Let's scan the \ **LAYER** \object attributes top-down and look for things we're going to have to change to accommodate our new layer.
+    
+7. It looks like we're going to make edits to the \ **NAME, DATA, CLASSITEM, MAXSCALEDENOM AND CLASS** \attributes. Some of these are going to be easy while others, namely \ **DATA, CLASS** \attributes are going to be harder. 
+
+8. Change the \ **NAME, MAXSCALEDENOM** \attributes to look like this::
+
+    NAME "res_buildings"
+    ...
+    MAXSCALEDENOM 70000
+
+9. Delete all \ **EXPRESSION** \ variables from the \ **CLASS** \attributes so they look like this:
+
+10.  
+
+    
