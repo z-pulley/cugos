@@ -8,12 +8,12 @@ echo "####################################################################"
 echo ""
 echo ""
 echo "######## vmstat output #########################"
-vmstat 1 20 
-echo "######## process tree for user postgres  #######"
-ps -ALF | sort -nr -k 4 | head -30
+vmstat 1 15
+#echo "######## process tree for user postgres  #######"
+#ps -ALF | sort -nr -k 4 | head -30
 #ps -U postgres -H
-#echo "######## process tree -F user postgres #########"
-#ps -U postgres -jHF
+echo "######## process tree -F user postgres #########"
+ps -U postgres -jHF
 #echo "######## thread listing for user postgres ######"
 #ps -ALF | sort -nr -k 3 | head -30
 #ps -U postgres -LF
