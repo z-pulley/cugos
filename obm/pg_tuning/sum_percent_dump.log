@@ -1,0 +1,32 @@
+
+>>> SCRIPT LAST RUN @  Fri May 6 16:49:01 PDT 2011 
+
+             relname              |  buffered  | buffers_percent | percent_of_relation 
+----------------------------------+------------+-----------------+---------------------
+ pg_opclass_am_name_nsp_index     | 16 kB      |             0.0 |               100.0
+ pg_rewrite_rel_rulename_index    | 16 kB      |             0.0 |               100.0
+ pg_operator_oid_index            | 32 kB      |             0.0 |               100.0
+ pg_opclass_oid_index             | 16 kB      |             0.0 |               100.0
+ pg_statistic_relid_att_inh_index | 24 kB      |             0.0 |                42.9
+ pg_namespace                     | 8192 bytes |             0.0 |               100.0
+ pg_operator                      | 80 kB      |             0.0 |                71.4
+ pg_index                         | 16 kB      |             0.0 |                33.3
+ pg_amproc_fam_proc_index         | 16 kB      |             0.0 |               100.0
+ pg_index_indrelid_index          | 16 kB      |             0.0 |               100.0
+ pg_amproc                        | 24 kB      |             0.0 |               100.0
+ pg_statistic                     | 24 kB      |             0.0 |                 6.0
+ pg_cast_source_target_index      | 16 kB      |             0.0 |               100.0
+ pg_amop_fam_strat_index          | 24 kB      |             0.0 |                75.0
+ pg_rewrite                       | 32 kB      |             0.0 |                40.0
+ pg_cast                          | 16 kB      |             0.0 |               100.0
+ pg_aggregate_fnoid_index         | 16 kB      |             0.0 |               100.0
+ pg_index_indexrelid_index        | 16 kB      |             0.0 |               100.0
+ pg_operator_oprname_l_r_n_index  | 32 kB      |             0.0 |                80.0
+ pg_opclass                       | 16 kB      |             0.0 |               100.0
+ pg_amop                          | 24 kB      |             0.0 |               100.0
+ pg_am                            | 8192 bytes |             0.0 |               100.0
+ pg_namespace_nspname_index       | 16 kB      |             0.0 |               100.0
+ pg_aggregate                     | 8192 bytes |             0.0 |               100.0
+ pg_amop_opr_fam_index            | 16 kB      |             0.0 |               100.0
+(25 rows)
+

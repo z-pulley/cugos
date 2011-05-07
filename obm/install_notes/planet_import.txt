@@ -109,11 +109,10 @@ cd /mnt/z-raid6/gis/osm/extracts/planet_dumps/ or /mnt/travel-disk/planet_downlo
 4. import_changes.sh --> a bash script showing how mkenny imported daily diffs into sfo test dataset
 5. update-db.sh --> a bash script added to cronjob showing how mkenny got synched minutely updates using osmosis and osm2pgsql
 
-## I commented out mkenny's daily diff runs in import_changes.sh 
-## and created a new section to run planetimport daily diffs.
-## It looks like this:
-"""
-# osm2pgsql commands for applying daily and hourly diffs to planetimport from
+
+
+#### osm2pgsql script for applying daily diffs to planetimport.
+#### this is an old version. See new and improved version below
 DIFFDIR="/mnt/z-raid6/gis/osmosis_working/daily_diffs/"
 SUFFIX="gz"
 HOST=$(hostname|cut -f1 -d.)
@@ -129,4 +128,56 @@ do
         ENDTIMESTAMP=$(date +%m/%d/%y.%H:%M:%S)
         echo "TARGET DIFF >>> " $diff " END processing at >>> " $ENDTIMESTAMP #> $LOGDIR/$LOGFILE
 done   
-"""
+#### new and improved daily diff osm2pgsql script
+#!/bin/bash
+for FILE in $(find *.gz -type f);
+do
+    BEGTIMESTAMP_PDT=$(date)
+    BEGTIMESTAMP_UTC=$(TZ=UTC date)
+    echo "\nStarting daily diff append " $FILE " at >>> " $BEGTIMESTAMP_PDT >> update_daily_diff.log 2>&1
+    echo "\nUTC Time currently >>> " $BEGTIMESTAMP_UTC "\n"  >> update_daily_diff.log 2>&1
+
+    /usr/local/src/osm2pgsql/osm2pgsql --append --slim -d planet0304 -H localhost -P 5432 -C 2500 -S /usr/local/share/osm2pgsql/default.style $FILE >> update_daily_diff.log 2>&1
+
+    ENDTIMESTAMP_PDT=$(date)
+    ENDTIMESTAMP_UTC=$(TZ=UTC date)
+    echo "\nEnded daily diff append " $FILE " at >>> " $ENDTIMESTAMP_PDT  >> update_daily_diff.log 2>&1
+    echo "\nUTC Time currently >>> " $ENDTIMESTAMP_UTC "\n"  >> update_daily_diff.log 2>&1
+
+done;
+
+exit 0
+
+
+
+#### osm2pgsql / osmosis script used for hourly and minutely diffs (in osmosis working directory as update-daily.sh script)
+#!/bin/bash
+TIMESTAMP_PDT=$(date)
+TIMESTAMP_UTC=$(TZ=UTC date)
+
+if [ -e /mnt/z-raid6/gis/osmosis_working/download.lock ]
+then
+    echo
+    echo "  >>> UPDATE ATTEMPTED  @ " $TIMESTAMP_PDT
+    echo "  >>> CURRENT UTC TIME  @ " $TIMESTAMP_UTC
+else
+    touch /mnt/z-raid6/gis/osmosis_working/download.lock
+    
+    echo
+    echo "START >>> osmosis minutely diffs at " $TIMESTAMP_PDT
+    echo "        >>> CURRENT UTC TIME at " $TIMESTAMP_UTC  
+
+    /usr/local/src/osmosis/osmosis-0.38/bin/osmosis --read-replication-interval workingDirectory=/mnt/z-raid6/gis/osmosis_working/ --simplify-change --write-xml-change /mnt/z-raid6/gis/osmosis_working/changes.osc.gz
+
+    /usr/local/src/osm2pgsql/osm2pgsql --append --slim -d planet0304 -H localhost -P 5432 -C 3000 -S /usr/local/share/osm2pgsql/default.style /mnt/z-raid6/gis/osmosis_working/changes.osc.gz
+ 
+    rm /mnt/z-raid6/gis/osmosis_working/download.lock
+
+    ENDTIMESTAMP_PDT=$(date)
+    ENDTIMESTAMP_UTC=$(TZ=UTC date)
+    
+    echo
+    echo "FINISHED >>> osmosis minutely diffs at " $ENDTIMESTAMP_PDT
+    echo "           >>> CURRENT UTC TIME at " $ENDTIMESTAMP_UTC
+
+fi

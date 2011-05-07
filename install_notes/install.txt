@@ -14,7 +14,7 @@
 sudo apt-get install emacs
 
 # Can create some user accounts
-adduser <your user>
+adduser --ingroup=cugos <your user> 
 
 # Add those new users to the sudoers
 visudo

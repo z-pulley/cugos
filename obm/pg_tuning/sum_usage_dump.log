@@ -1,0 +1,12 @@
+
+>>> SCRIPT LAST RUN @  Fri May 6 16:38:00 PDT 2011 
+
+ usagecount | count  | isdirty 
+------------+--------+---------
+          2 |      8 | f
+          3 |      2 | f
+          4 |     11 | f
+          5 |    207 | f
+            | 255772 | 
+(5 rows)
+

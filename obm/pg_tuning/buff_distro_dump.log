@@ -1,0 +1,40 @@
+
+>>> SCRIPT LAST RUN @  Fri May 6 16:51:55 PDT 2011 
+
+             relname              | buffers | usagecount 
+----------------------------------+---------+------------
+ pg_aggregate                     |       1 |          5
+ pg_aggregate_fnoid_index         |       2 |          5
+ pg_am                            |       1 |          5
+ pg_amop                          |       1 |          4
+ pg_amop                          |       2 |          5
+ pg_amop_fam_strat_index          |       3 |          5
+ pg_amop_opr_fam_index            |       2 |          5
+ pg_amproc                        |       2 |          2
+ pg_amproc                        |       1 |          5
+ pg_amproc_fam_proc_index         |       2 |          5
+ pg_cast                          |       1 |          4
+ pg_cast                          |       1 |          5
+ pg_cast_source_target_index      |       2 |          5
+ pg_index                         |       2 |          5
+ pg_index_indexrelid_index        |       2 |          5
+ pg_index_indrelid_index          |       2 |          5
+ pg_namespace                     |       1 |          5
+ pg_namespace_nspname_index       |       2 |          5
+ pg_opclass                       |       2 |          5
+ pg_opclass_am_name_nsp_index     |       2 |          5
+ pg_opclass_oid_index             |       2 |          5
+ pg_operator                      |       1 |          2
+ pg_operator                      |       2 |          3
+ pg_operator                      |       2 |          4
+ pg_operator                      |       5 |          5
+ pg_operator_oid_index            |       1 |          2
+ pg_operator_oid_index            |       3 |          5
+ pg_operator_oprname_l_r_n_index  |       4 |          5
+ pg_rewrite                       |       3 |          1
+ pg_rewrite                       |       1 |          5
+ pg_rewrite_rel_rulename_index    |       2 |          5
+ pg_statistic                     |       3 |          5
+ pg_statistic_relid_att_inh_index |       3 |          5
+(33 rows)
+
